@@ -25,16 +25,32 @@ import qbc
 COMBO = re.compile(r'(Air|Lip|SpAir|SpGrind|SpLip|SpMan|Extra)_[A-Za-z_]+')
 
 
+def parse_trick(text):
+    """Parse one trick like 'Air_SquareL' or 'Air_CircleU x2' into (combo, taps).
+    Returns None for blank/comment-only text; raises ValueError if malformed."""
+    line = text.split('#', 1)[0].strip()
+    if not line:
+        return None
+    m = re.fullmatch(r'(\S+)(?:\s+x(\d+))?', line)
+    if not m or not COMBO.fullmatch(m.group(1)):
+        raise ValueError(f'expected a key combo like Air_SquareL [x2], got {line!r}')
+    return m.group(1), int(m.group(2) or 1)
+
+
+def combo_q(combo, taps):
+    """QB text for one goal_tetris_key_combos element."""
+    return combo if taps == 1 else f'{{ key_combo = {combo} num_taps = {taps} }}'
+
+
 def parse(path):
     tricks = []
     for n, raw in enumerate(open(path), 1):
-        line = raw.split('#', 1)[0].strip()
-        if not line:
-            continue
-        m = re.fullmatch(r'(\S+)(?:\s+x(\d+))?', line)
-        if not m or not COMBO.fullmatch(m.group(1)):
-            sys.exit(f'{path}:{n}: expected a key combo like Air_SquareL [x2], got {line!r}')
-        tricks.append((m.group(1), int(m.group(2) or 1)))
+        try:
+            t = parse_trick(raw)
+        except ValueError as e:
+            sys.exit(f'{path}:{n}: {e}')
+        if t:
+            tricks.append(t)
     if not tricks:
         sys.exit(f'{path}: no tricks')
     return tricks
@@ -43,8 +59,7 @@ def parse(path):
 def to_q(tricks):
     out = ['doakickflip_tricks = [']
     for combo, taps in tricks:
-        item = combo if taps == 1 else f'{{ key_combo = {combo} num_taps = {taps} }}'
-        out.append(f'{{ goal_tetris_key_combos = [ {item} ] }}')
+        out.append(f'{{ goal_tetris_key_combos = [ {combo_q(combo, taps)} ] }}')
     out.append(']')
     return '\n'.join(out) + '\n'
 
