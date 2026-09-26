@@ -18,6 +18,7 @@ gitignored.
 | `qbc.py in.q out.qb` | compile `.q` back to QB bytecode (no `switch`/`elseif`/`Random` yet) |
 | `roundtrip.py DIR ...` | decompile and recompile every `.qb`, check the bytes match |
 | `extract.py --thug2 DIR --thugpro DIR` | unpack and decompile both games' scripts into `extracted/` |
+| `tricks.py TRICKS.txt --thugpro DIR` | compile a plain-text trick list to `User/Data/doakickflip/tricks.qb` |
 | `build_mod.py THUGPRO_DIR [--install]` | build the patched `thugpro_qb.prx` into `build/`, optionally install it (backs up the original to `.bak` once) |
 | `run_thugpro.sh` | launch `THUGPro.exe` via `umu-run` with Proton logging into `logs/` |
 
@@ -41,7 +42,11 @@ updater may put the stock archive back. To uninstall, move
 cause trouble on online servers.
 
 The mod source is `mod/doakickflip.q`. `build_mod.py` appends it to the pause
-menu script and inserts one call into the free skate section.
+menu script, inserts one call into the free skate section, and hooks
+`goal_tetris_add_trick`. Tricks are called out in the order listed in
+`mod/tricks.txt`. Install that with
+`python3 tools/tricks.py mod/tricks.txt --thugpro "$THUGPRO"`; it's re-read each
+time Skate-Tricks starts.
 
 See [NOTES.md](NOTES.md) for file formats, how the Skate-Tricks goal works, and
 the debugging trail.

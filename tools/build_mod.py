@@ -21,7 +21,9 @@ import qbdec
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAUSE = 'qb\\game\\menu\\gamemenu_pause.qb'
+TETRIS = 'qb\\game\\goals\\goal_tetris.qb'
 HOOK_CALL = 'doakickflip_pause_menu_items'
+TRICK_HOOK_CALL = 'doakickflip_on_trick_added'
 
 
 def insert_hook(text):
@@ -48,6 +50,17 @@ def insert_hook(text):
     sys.exit('unterminated singlesession block')
 
 
+def insert_trick_hook(text):
+    """Call TRICK_HOOK_CALL at the top of goal_tetris_add_trick, which the engine
+    runs each time it adds a trick to a Skate-Tricks stack."""
+    lines = text.split('\n')
+    starts = [i for i, l in enumerate(lines) if l.strip() == 'script goal_tetris_add_trick']
+    if len(starts) != 1:
+        sys.exit(f'expected one goal_tetris_add_trick script, found {len(starts)}')
+    lines.insert(starts[0] + 1, '    ' + TRICK_HOOK_CALL)
+    return '\n'.join(lines)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('thugpro_dir')
@@ -64,14 +77,16 @@ def main():
              for name, size, csize, _crc, blob in prx.entries(data)}
     for body in files.values():
         qbdec.harvest(body)
-    text = qbdec.Dec(files[PAUSE]).run()
-    text = insert_hook(text)
-    text += '\n' + open(os.path.join(ROOT, 'mod', 'doakickflip.q')).read()
-    compiled = qbc.compile_text(text)
+    pause = insert_hook(qbdec.Dec(files[PAUSE]).run())
+    pause += '\n' + open(os.path.join(ROOT, 'mod', 'doakickflip.q')).read()
+    tetris = insert_trick_hook(qbdec.Dec(files[TETRIS]).run())
+    patched = {PAUSE: qbc.compile_text(pause), TETRIS: qbc.compile_text(tetris)}
 
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
-    prx.replace(src, args.out, {PAUSE: compiled})
-    print(f'built {args.out} from {src} ({PAUSE}: {len(files[PAUSE])} -> {len(compiled)} bytes)')
+    prx.replace(src, args.out, patched)
+    print(f'built {args.out} from {src}')
+    for name, body in patched.items():
+        print(f'  {name}: {len(files[name])} -> {len(body)} bytes')
 
     if args.install:
         if not os.path.exists(backup):

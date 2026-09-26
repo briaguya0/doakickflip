@@ -6,7 +6,7 @@
 # Usage: WINEPREFIX=/path/to/prefix PROTONPATH=/path/to/GE-Proton tools/run_thugpro.sh
 # Optional: THUGPRO_DIR (defaults to the Lutris install location inside the prefix)
 set -euo pipefail
-: "${WINEPREFIX:?set WINEPREFIX to the game's wine prefix}"
+: "${WINEPREFIX:?set WINEPREFIX to the wine prefix of the game}"
 : "${PROTONPATH:?set PROTONPATH to the Proton build (e.g. .../compatibilitytools.d/GE-Proton11-7-x86_64)}"
 THUGPRO_DIR="${THUGPRO_DIR:-$WINEPREFIX/drive_c/users/steamuser/AppData/Local/THUG Pro}"
 LOG_DIR="$(cd "$(dirname "$0")/.." && pwd)/logs"

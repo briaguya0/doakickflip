@@ -148,6 +148,68 @@ Resolved checksums seen in native code: `0x7be1e689` goal_tetris_key_combos,
 key_combo, `0xa4bee6a1` num_taps, `0xdf1451eb` cag_key_combos, `0x6d641bcb`
 emergency_key_combos, `0x270f56e1` trick, `0x255ed86f` grind, `0xc4745838` text.
 
+## THUG Pro file redirect and `User\Data`
+
+`thugpro.dll` hooks `CreateFileA` (hook entry `0x10014bb0`). For any path
+containing `Data\` (matched with `StrStrIA`, so case-insensitive; the engine
+uses lowercase `data\`) and not `thugpro.exe`:
+
+1. Look the path up in a cache of earlier redirects (`0x10015350`, FNV hash map;
+   filled at `0x10015211` after a successful search). It isn't an override
+   mechanism.
+2. Rewrite `.pre` to `.prx` (plus a similar swap on a `...tex` extension), then try
+   these roots in order, taking the first that opens (observed with `+file`):
+   1. the THUG Pro folder (stock install)
+   2. `<THUG Pro>\..\output\`
+   3. the THUG2 install folder (e.g. `C:\Program Files (x86)\Activision\Tony Hawk's Underground 2\Game\`)
+   4. `<THUG Pro>\User\`
+3. A missing-image fallback substitutes a placeholder texture.
+
+So `User\Data\...` can only **add** files the stock install lacks; it can't
+override `data\pre\thugpro_qb.prx`. A `+file` trace of startup, loading a level,
+and free skate showed the only files probed under `User\` and not found are
+`manifest_levels.dat` and `manifest_soundtracks.dat` (custom level / soundtrack
+manifests). No stray script loads, so there's no zero-patch hook. Custom
+levels load `User\data\levels\<name>\<name>_scripts.qb`, which would only
+work inside that level.
+
+`LoadQB "doakickflip\\tricks.qb"` from script does go through the redirect and
+reads a loose `User\Data\doakickflip\tricks.qb` (verified). The mod uses this
+for the trick list: the file is compiled QB (from `mod/tricks.txt` via
+`tools/tricks.py`) and reloaded every time the goal starts, so it can change
+without restarting the game.
+
+## Trick order
+
+The engine picks each new trick at random from `goal_tetris_key_combos`, re-read
+from the goal params on every add, and runs `goal_tetris_add_trick` (looked up
+by name) on each new trick's screen element. The mod patches
+`goal_tetris_add_trick` to call `doakickflip_on_trick_added`, which sets the
+list to the next single trick via `GoalManager_EditGoal`. At the end of the list
+it sets `wait_to_add_tricks = 1` (read by the engine) to stop adding. Verified in
+game: tricks appear in file order and stop after the last one.
+
+Other native tetris script hooks the engine calls by name:
+`goal_tetris_add_red_trick`, `goal_tetris_remove_trick`,
+`goal_tetris_turn_trick_red`, `goal_tetris_turn_trick_white`,
+`goal_tetris_reset_trick_container`, `goal_tetris_play_trick_removed_sound`.
+
+## Channels for live input (towards "do a trick" on demand)
+
+- **Chat commands**: `global_cmd_array` in `qb/thugpro/command_parser.q` maps
+  `/COMMAND` strings to scripts. You can type chat yourself only
+  `if InNetGame`. Incoming messages are parsed as commands only when the sender
+  is in `whitelist_player_array` (`qb/engine/menu/consolemessage.q`). This is the
+  likely network path.
+- **Registry**: THUG Pro exposes `GetRegKeyValue` / `SetRegKeyValue` /
+  `RegKeyExist` to scripts (it keeps its settings in `HKCU\Software\THUG Pro`).
+  Rejected: messy for Windows users.
+- **File inbox** (chosen next): poll `LoadQB` of a small `.qb` in `User\Data`.
+- No script-level "read a text file" function exists in `THUGPro.exe` or
+  `thugpro.dll`. THUG Pro's own script functions include `StripStringColorCodes`,
+  `ResizeStringInPlace`, `LookupChecksumName`, `CastChecksumToInteger`,
+  `SplitConsoleMessage`, `GetSaveDirectoryListing`, `FindSpawnedScriptWithID`.
+
 ## Running / debugging under Lutris + umu (GE-Proton)
 
 - `lutris lutris:rungameid/N` hands off to a running Lutris GUI, so you don't
@@ -166,7 +228,8 @@ emergency_key_combos, `0x270f56e1` trick, `0x255ed86f` grind, `0xc4745838` text.
 
 ## Ideas / next steps
 
-- Make trick callouts come from outside the game (the "doakickflip" goal):
-  e.g. drive `goal_tetris_key_combos` or a script that injects tricks.
-  `GoalManager_ClearTetrisTricks` exists as a script function.
+- Call out tricks on demand from outside the game: keep the goal paused
+  (`wait_to_add_tricks = 1`) and unpause for exactly one add per request, fed
+  by the file inbox, later by chat commands. `GoalManager_ClearTetrisTricks`
+  exists as a script function.
 - Compiler: add `switch`/`elseif`/`Random*` so any script can be recompiled.
