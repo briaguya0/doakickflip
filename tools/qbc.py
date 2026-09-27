@@ -147,6 +147,11 @@ class Compiler:
                         continue
                 self.b.append(SIMPLE[t])
             elif kind == 'name':
+                nxt = toks[i + 1][1] if i + 1 < len(toks) else None
+                if nxt == '=' and t in ('script', 'endscript', 'if', 'else', 'endif', 'begin',
+                                        'repeat', 'break', 'return', 'switch', 'case',
+                                        'default', 'endswitch', 'elseif'):
+                    raise SyntaxError(f'line {self.lineno}: keyword {t!r} used as a name')
                 if t == 'script':
                     self.b.append(0x23)
                 elif t == 'endscript':

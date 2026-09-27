@@ -239,6 +239,73 @@ bytes: `0x16 <u32 qbkey>` name, `0x07` `=`, `0x17 <i32>` int, `0x03`/`0x04`
 struct braces, `0x05`/`0x06` array brackets, `0x01` newline, and the file ends
 with `0x00`. The name table (`0x2B` entries) is optional.
 
+## High combo mode ("Do a Kickflip!", current design)
+
+Chat picks the tricks; your normal combo is the score. A request clears as soon
+as you do the trick, mid-combo, and too many pending requests make you bail.
+This no longer uses the Skate-Tricks goal at all. Its native logic only clears
+tricks when the combo is banked, fails the goal on overflow, and offers no
+script function to remove a single trick:
+
+- Removal of done tricks (`0x570a70`) runs only from `ClearPanel_Landed`
+  (`0x523560` member-function switch, case `0x11ca5c42`), which is also what
+  banks the combo (`tricks.q`), so script can't trigger it mid-combo.
+- `Trick_Flag` (used by NY's burning-taxi goal) only gates the same on-land
+  check. Per-trick removal (`0x574f00`) belongs to the Trick to the Beat class.
+
+What's used instead, all from script (`mod/doakickflip.q`):
+
+- **Detecting a done trick:** `GetNumberOfTrickOccurrences TrickText = "Kickflip"`
+  returns `Number_Of_Occurrences` in the current combo (native `0x5b1610`: it
+  checksums the text and asks the skater's combo). It's a **global** function.
+  Called as `skater: GetNumberOfTrickOccurrences` the result never reaches the
+  calling script. Each entry stores a baseline count taken at request time; the
+  entry clears when the count exceeds it, and the baseline resets when counts
+  drop (the combo ended). Grinds are stored with a direction (`BS 50-50`).
+- **The list is the stock Skate-Tricks UI:** `create_tetris_menu`
+  (`tetris_menu_anchor` / `tetris_tricks_menu`), and each entry is built like
+  the engine builds one (`~0x570100`): a `ContainerElement` with
+  `dims = (100, 20)`, child 0 = trick text in `newtrickfont`, child 1 = button
+  glyphs from `goal_tetris_trick_text` / `goal_tetris_trick_text_double_tap`.
+  The stock `goal_tetris_add_trick` / `goal_tetris_remove_trick` /
+  `goal_tetris_turn_trick_red` / `_white` /
+  `goal_tetris_play_trick_removed_sound` animate them (pass
+  `Params = { id = <entry> }`; `no_key_combo` when there are no glyphs).
+- **Layout:** a VMenu only lays children out when locked. Lock on then off
+  (like `refresh_scrolling_menu` in `net_vault_menu.q`) after changes, or every
+  entry is drawn at the menu origin. Done every poll.
+- **Trick name to button glyphs:** loop the air/lip key combos and call
+  `GoalManager_GetTrickFromKeyCombo key_combo = X`. The native code (`0x55a700`)
+  returns `trick_string` (the slot trick's display name), `extra_trick_string`
+  (its first `ExtraTricks` entry, i.e. the double tap, e.g. Method on the
+  Melon slot), `trick_checksum` and `cat_num` (created tricks). Adding
+  `special` searches the profile's `specials` (`trickSlot` / `trickName`,
+  looping `max_specials`) and returns `trick_string` / `trick_checksum` /
+  `current_index`. Compare names as checksums (`FormatText ChecksumName`):
+  trick definitions use local strings (`'Kickflip'`), which don't compare
+  equal to strings. Manuals and grinds aren't in slots, so they get no glyphs.
+- **Overflow:** `MakeSkaterGoto YawBail` (the generic bail; vehicle bails use
+  it too), then every entry turns red and is removed.
+- **Inbox v2:** `doakickflip_inbox = [ { seq = N trick = "Kickflip" user = "name" } ... ]`,
+  polled every 6 frames; all new requests are added at once.
+
+QB gotchas found here:
+
+- A bare global name in an expression is its checksum, not its value
+  (`<x> = some_global` gives `some_global`). Parentheses evaluate it, but
+  reading/writing global *strings* didn't work in either form. Keep strings in
+  element tags (`SetTags` / `GetTags`) instead.
+- Script `printf` is a no-op in this build (`Printf` → `0x5b9760`, a
+  `return true` stub), and `ScriptAssert` formats and discards. For debugging,
+  `doakickflip_debug = 1` shows an overlay with recent events and each entry's
+  count, baseline and position. It uses `z_priority = 10000` so it draws over
+  the pause menu, which also freezes it for screenshots.
+- `"\n"` in `.q` source is needed for the game's newline escape; `"
+"`
+  compiles to a raw newline character.
+- Keywords can't be used as parameter names (`script = ...`); `qbc.py`
+  now rejects that.
+
 ## Channels for live input (towards "do a trick" on demand)
 
 - **Chat commands**: `global_cmd_array` in `qb/thugpro/command_parser.q` maps
@@ -277,8 +344,11 @@ with `0x00`. The name table (`0x2B` entries) is optional.
 
 ## Ideas / next steps
 
-- Feed live mode from the network: a `/trick <combo>` chat command calling
-  the same request path. `GoalManager_ClearTetrisTricks` exists as a script
-  function.
-- Untested: the red "stack nearly full" warning in live mode.
+- Twitch bridge: a separate program that writes the inbox from Twitch chat
+  (anonymous IRC read is enough), with name aliases and flood control
+  (per-user cooldown, global rate, pending cap).
+- Untested: the red "nearly full" warning in high combo mode.
+- Triple taps (Triple Kickflip = Double Kickflip's own `ExtraTricks`) would
+  need walking `ExtraTricks` by hand and a triple-tap glyph string.
+- Grinds: requests like "50-50" should match `FS 50-50` and `BS 50-50`.
 - Compiler: add `switch`/`elseif`/`Random*` so any script can be recompiled.

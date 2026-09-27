@@ -1,158 +1,148 @@
-// doakickflip: Skate-Tricks (Skatetris) from the free skate pause menu.
+// doakickflip: high combo mode where chat picks the tricks.
 // Appended to qb\game\menu\gamemenu_pause.qb by tools/build_mod.py.
 //
-// List mode (doakickflip_start, no menu item): calls out tricks in the order given by
-// data\doakickflip\tricks.qb, which THUG Pro's file redirect resolves to
-// <THUG Pro>\User\Data\doakickflip\tricks.qb (tools/tricks.py writes it):
-//     doakickflip_tricks = [ { goal_tetris_key_combos = [ <combo> ] } ... ]
+// "Do a Kickflip!" in the free skate pause menu shows a list of requested
+// tricks (the stock Skate-Tricks stack, bottom right), each with the name of
+// whoever asked for it. Requests come from data\doakickflip\inbox.qb, which
+// THUG Pro's file redirect resolves to <THUG Pro>\User\Data\doakickflip\inbox.qb
+// (tools/call_trick.py and tools/fake_chat.py write it):
+//     doakickflip_inbox = [ { seq = N trick = "Kickflip" user = "name" } ... ]
 //
-// Live mode ("Do a Kickflip!"): the goal sits idle and calls out one trick per
-// request found in data\doakickflip\inbox.qb (User\Data again;
-// tools/call_trick.py writes it), polled while the goal is active:
-//     doakickflip_inbox = [ { seq = N goal_tetris_key_combos = [ <combo> ] } ... ]
+// A request clears as soon as the trick is done, mid-combo: every frame we ask
+// how many times the trick is in the current combo (GetNumberOfTrickOccurrences,
+// the same check levels use for "do a kickflip over X" goals) and compare
+// against the count when the request came in. It's a global function (it finds
+// the skater itself); called as "skater: GetNumberOfTrickOccurrences" its
+// result never reaches our script. If
+// more than doakickflip_max_pending requests pile up, the skater bails and the
+// list clears. The score is just the normal combo score.
 //
-// How both work: the engine picks each new trick at random from the goal's
-// goal_tetris_key_combos, so we keep that list at exactly one entry. The engine
-// runs goal_tetris_add_trick every time it adds a trick; build_mod.py makes that
-// call doakickflip_on_trick_added, which either swaps in the next trick (list
-// mode) or holds off further adds (live mode).
-//
-// Holding off adds: the engine adds a trick when its "ms since last add" counter
-// exceeds goal param #648d8d2a (no known name; copied from trick_time when the
-// goal activates, then shortened by acceleration_percent every
-// acceleration_interval cleared tricks). Setting it huge pauses adding; setting
-// it low adds on the next frame. Don't use wait_to_add_tricks for this: it makes
-// the engine skip the whole Skate-Tricks update, including fading tricks you've
-// done in the current combo and the "stack nearly full" red warning.
+// Each request is an entry in the stock tetris_tricks_menu, tagged with
+// trick / baseline / removing, so the menu's children are the pending queue.
 
-doakickflip_trick_index = 0
-doakickflip_live = 0
-doakickflip_pending = 0
+doakickflip_active = 0
 doakickflip_last_seq = 0
+doakickflip_max_pending = 8
+// 1 = show a debug overlay (top left, drawn above the pause menu): the last
+// few events, then one line per entry with its count, baseline and position.
+// Pause to freeze it for a screenshot.
+doakickflip_debug = 0
 
 script doakickflip_pause_menu_items
-    if GoalManager_GoalExists name = doakickflip
-        if GoalManager_GoalIsActive name = doakickflip
-            make_thugpro_menu_item {
-            text = "End Skate-Tricks"
-            id = menu_doakickflip_end
-            pad_choose_script = menu_select
-            pad_choose_params = { menu_select_script = doakickflip_end }
-            }
-            return
-        endif
+    if (doakickflip_active = 1)
+        make_thugpro_menu_item {
+        text = "Stop Do a Kickflip!"
+        id = menu_doakickflip_end
+        pad_choose_script = menu_select
+        pad_choose_params = { menu_select_script = doakickflip_end }
+        }
+    else
+        make_thugpro_menu_item {
+        text = "Do a Kickflip!"
+        id = menu_doakickflip_start
+        pad_choose_script = menu_select
+        pad_choose_params = { menu_select_script = doakickflip_start }
+        }
     endif
-    // List mode (doakickflip_start) is still available but has no menu item.
-    make_thugpro_menu_item {
-    text = "Do a Kickflip!"
-    id = menu_doakickflip_start_live
-    pad_choose_script = menu_select
-    pad_choose_params = { menu_select_script = doakickflip_start_live }
-    }
 endscript
 
 script doakickflip_start
-    UnloadQB "doakickflip\\tricks.qb"
-    LoadQB "doakickflip\\tricks.qb"
-    doakickflip_add_goal
-    change doakickflip_live = 0
-    GoalManager_EditGoal name = doakickflip Params = { can_retry_goal wait_to_add_tricks = 0 trick_time = 3000 }
-    change doakickflip_trick_index = 0
-    doakickflip_set_next_trick
-    GoalManager_ActivateGoal name = doakickflip
-    exit_pause_menu
-endscript
-
-script doakickflip_start_live
-    doakickflip_add_goal
-    change doakickflip_live = 1
-    change doakickflip_pending = 0
+    doakickflip_create_ui
     doakickflip_load_inbox
     doakickflip_skip_old_requests
-    GoalManager_EditGoal name = doakickflip Params = { can_retry_goal wait_to_add_tricks = 0 }
-    GoalManager_ActivateGoal name = doakickflip
-    // after activation, which resets the interval from trick_time
-    doakickflip_hold_adds
-    KillSpawnedScript name = doakickflip_inbox_poll
-    SpawnScript doakickflip_inbox_poll
+    change doakickflip_active = 1
+    KillSpawnedScript name = doakickflip_loop
+    SpawnScript doakickflip_loop
     exit_pause_menu
 endscript
 
 script doakickflip_end
     exit_pause_menu
-    KillSpawnedScript name = doakickflip_inbox_poll
-    GoalManager_DeactivateGoal name = doakickflip
+    change doakickflip_active = 0
+    KillSpawnedScript name = doakickflip_loop
+    doakickflip_destroy_ui
 endscript
 
-script doakickflip_add_goal
-    if NOT GoalManager_GoalExists name = doakickflip
-        GoalManager_AddGoal name = doakickflip {
-        // Same as goal_tetris_genericParams minus trigger_obj_id / start_pad_id /
-        // restart_node: those name level nodes that don't exist outside a career
-        // level, and with quick_start goal_initialize_skater does
-        // ResetSkaters node_name = <restart_node>.
-        Params = {
-        Goal_Text = "Skate-Tricks"
-        View_Goals_Text = "Skate-Tricks"
-        init = goal_tetris_init
-        uninit = goal_uninit
-        activate = goal_tetris_activate
-        success = goal_tetris_success
-        fail = goal_tetris_fail
-        deactivate = goal_tetris_deactivate
-        expire = goal_tetris_expire
-        trick_time = 3000
-        max_tricks = 15
-        acceleration_interval = 5
-        acceleration_percent = 0.1
-        time_to_stop_adding_tricks = 5
-        tetris
-        record_type = score
-        quick_start
-        unlimited_time
-        // The Skate-Tricks updater in THUGPro.exe (~0x56fb3e) reads
-        // goal_tetris_key_combos; without it, it falls back to goal_tetris_tricks
-        // and dereferences NULL. Elements may be bare key-combo names or
-        // { key_combo = X num_taps = N } structs. Replaced per trick.
-        goal_tetris_key_combos = [ Air_SquareL ]
-        }
-        }
+// The list reuses the stock Skate-Tricks UI: create_tetris_menu for the
+// menu, and each request is built the way the engine builds a Skate-Tricks
+// entry (THUGPro.exe ~0x570100): a ContainerElement (dims 100x20) in
+// tetris_tricks_menu with child 0 = trick name (newtrickfont) and child 1 =
+// button glyphs from goal_tetris_trick_text, animated by the stock
+// goal_tetris_* scripts.
+script doakickflip_create_ui
+    doakickflip_destroy_ui
+    create_tetris_menu
+endscript
+
+script doakickflip_destroy_ui
+    if ScreenElementExists id = tetris_menu_anchor
+        DestroyScreenElement id = tetris_menu_anchor
+    endif
+    if ScreenElementExists id = doakickflip_debug_text
+        DestroyScreenElement id = doakickflip_debug_text
     endif
 endscript
 
-// Called from goal_tetris_add_trick (for every Skate-Tricks goal), after the
-// engine has added a trick to the stack.
-script doakickflip_on_trick_added
-    if GoalManager_GoalExists name = doakickflip
-        if GoalManager_GoalIsActive name = doakickflip
-            if (doakickflip_live = 1)
-                doakickflip_hold_adds
-                change doakickflip_pending = 0
-            else
-                doakickflip_set_next_trick
-            endif
+// line: remember as the most recent debug event (keeps the last four).
+// Kept as tags on the list's anchor element: a bare global name in an
+// expression is just its checksum, and string globals didn't work either.
+script doakickflip_log
+    if NOT ScreenElementExists id = tetris_menu_anchor
+        return
+    endif
+    <ev1> = ""
+    <ev2> = ""
+    <ev3> = ""
+    tetris_menu_anchor: GetTags
+    tetris_menu_anchor: SetTags ev4 = <ev3> ev3 = <ev2> ev2 = <ev1> ev1 = <line>
+endscript
+
+// Redrawn every poll: last four events, then one line per entry.
+script doakickflip_debug_draw
+    <ev1> = ""
+    <ev2> = ""
+    <ev3> = ""
+    <ev4> = ""
+    if ScreenElementExists id = tetris_menu_anchor
+        tetris_menu_anchor: GetTags
+    endif
+    FormatText TextName = lines "%d\\n%c\\n%b\\n%a\\n--" a = <ev1> b = <ev2> c = <ev3> d = <ev4>
+    if GetScreenElementChildren id = tetris_tricks_menu
+        GetArraySize <children>
+        if (<array_size> > 0)
+            <i> = 0
+            begin
+                <child> = (<children> [ <i> ])
+                <child>: GetTags
+                Number_Of_Occurrences = -1
+                GetNumberOfTrickOccurrences TrickText = <trick>
+                GetScreenElementPosition id = <child>
+                <x> = (<ScreenElementPos>.(1.0, 0.0))
+                <y> = (<ScreenElementPos>.(0.0, 1.0))
+                FormatText TextName = lines "%l\\n%t occ=%o base=%b rm=%r pos=%x,%y" l = <lines> t = <trick> o = <Number_Of_Occurrences> b = <baseline> r = <removing> x = <x> y = <y>
+                <i> = (<i> + 1)
+            repeat <array_size>
         endif
     endif
-endscript
-
-// List mode: point the goal's trick pool at the next trick in the list, or stop
-// adding tricks once the list is used up.
-script doakickflip_set_next_trick
-    GetArraySize doakickflip_tricks
-    if (doakickflip_trick_index < <array_size>)
-        GoalManager_EditGoal name = doakickflip Params = (doakickflip_tricks [ doakickflip_trick_index ])
-        change doakickflip_trick_index = (doakickflip_trick_index + 1)
-    else
-        doakickflip_hold_adds
+    if ScreenElementExists id = doakickflip_debug_text
+        DestroyScreenElement id = doakickflip_debug_text
     endif
+    SetScreenElementLock id = root_window off
+    CreateScreenElement {
+    type = TextBlockElement
+    parent = root_window
+    id = doakickflip_debug_text
+    font = small
+    text = <lines>
+    pos = (20.0, 60.0)
+    just = [ left top ]
+    internal_just = [ left top ]
+    dims = (600.0, 300.0)
+    scale = 0.6
+    rgba = [ 128 128 0 128 ]
+    z_priority = 10000
+    }
 endscript
-
-// Stop the engine adding tricks until the interval is lowered again.
-script doakickflip_hold_adds
-    GoalManager_EditGoal name = doakickflip Params = { #648d8d2a = 2000000000 }
-endscript
-
-// Live mode below.
 
 script doakickflip_load_inbox
     UnloadQB "doakickflip\\inbox.qb"
@@ -160,7 +150,7 @@ script doakickflip_load_inbox
 endscript
 
 // Mark everything already in the inbox as handled, so only requests made after
-// the goal starts are called out.
+// the mode starts show up.
 script doakickflip_skip_old_requests
     change doakickflip_last_seq = 0
     GetArraySize doakickflip_inbox
@@ -175,41 +165,293 @@ script doakickflip_skip_old_requests
     endif
 endscript
 
-// Runs while live mode is active. One request in flight at a time: the next one
-// is taken only after the engine has added the previous trick.
-script doakickflip_inbox_poll
+// Every frame: clear done tricks. Every 6th frame: pick up new requests.
+script doakickflip_loop
+    <poll> = 0
     begin
-        if NOT GoalManager_GoalExists name = doakickflip
+        if (doakickflip_active = 0)
             break
         endif
-        if NOT GoalManager_GoalIsActive name = doakickflip
-            break
-        endif
-        if (doakickflip_pending = 0)
+        doakickflip_check_done
+        <poll> = (<poll> + 1)
+        if (<poll> > 5)
+            <poll> = 0
             doakickflip_load_inbox
-            doakickflip_take_next_request
+            doakickflip_take_new_requests
+            doakickflip_refresh_layout
+            if (doakickflip_debug = 1)
+                doakickflip_debug_draw
+            endif
         endif
-        wait 0.1 seconds
+        wait 1 gameframe
     repeat
 endscript
 
-// Requests are in seq order (oldest first); take the first one not yet handled.
-script doakickflip_take_next_request
+// A VMenu only lays its children out when it's locked; locking on then off
+// re-runs the layout (same as refresh_scrolling_menu in net_vault_menu.q).
+// Done every poll so entries reflow after adds (their grow-in animation starts
+// at scale 0) and after removed entries finish animating out.
+script doakickflip_refresh_layout
+    if ScreenElementExists id = tetris_tricks_menu
+        SetScreenElementLock id = tetris_tricks_menu on
+        SetScreenElementLock id = tetris_tricks_menu off
+    endif
+endscript
+
+// Requests are in seq order (oldest first); add every one not yet shown.
+script doakickflip_take_new_requests
     GetArraySize doakickflip_inbox
     if (<array_size> > 0)
         <i> = 0
         begin
             if (((doakickflip_inbox [ <i> ]).seq) > doakickflip_last_seq)
-                change doakickflip_last_seq = ((doakickflip_inbox [ <i> ]).seq)
-                change doakickflip_pending = 1
-                GoalManager_EditGoal name = doakickflip Params = (doakickflip_inbox [ <i> ])
-                // The add-counter has been running while idle, so this fires on the
-                // next frame; after the add it restarts from 0, and 100 ms leaves the
-                // hook time to hold adds again before a duplicate could be added.
-                GoalManager_EditGoal name = doakickflip Params = { #648d8d2a = 100 }
-                break
+                <req> = (doakickflip_inbox [ <i> ])
+                change doakickflip_last_seq = (<req>.seq)
+                doakickflip_add_request trick = (<req>.trick) user = (<req>.user)
             endif
             <i> = (<i> + 1)
         repeat <array_size>
+    endif
+    doakickflip_count_pending
+    if (<pending> > doakickflip_max_pending)
+        doakickflip_overflow
+    else
+        // like the stock stack: red when it's about to overflow
+        if (<pending> > (doakickflip_max_pending - 2))
+            doakickflip_color_pending color_script = goal_tetris_turn_trick_red
+        else
+            doakickflip_color_pending color_script = goal_tetris_turn_trick_white
+        endif
+    endif
+endscript
+
+script doakickflip_color_pending
+    if GetScreenElementChildren id = tetris_tricks_menu
+        GetArraySize <children>
+        if (<array_size> > 0)
+            <i> = 0
+            begin
+                <child> = (<children> [ <i> ])
+                <child>: GetTags
+                if (<removing> = 0)
+                    RunScriptOnScreenElement id = <child> <color_script> Params = { id = <child> }
+                endif
+                <i> = (<i> + 1)
+            repeat <array_size>
+        endif
+    endif
+endscript
+
+// trick, user
+script doakickflip_add_request
+    Number_Of_Occurrences = 0
+    GetNumberOfTrickOccurrences TrickText = <trick>
+    <baseline> = <Number_Of_Occurrences>
+    doakickflip_find_key_combo trick = <trick>
+    if (doakickflip_debug = 1)
+        // everything FormatText references must exist
+        <dbg_combo> = none
+        if GotParam key_combo
+            <dbg_combo> = <key_combo>
+        endif
+        <trick_checksum> = none
+        <cat_num> = none
+        GoalManager_GetTrickFromKeyCombo key_combo = Air_SquareL
+        FormatText TextName = dbg "add %t base=%b combo=%k | Air_SquareL -> %x / %n" t = <trick> b = <baseline> k = <dbg_combo> x = <trick_checksum> n = <cat_num>
+        doakickflip_log line = <dbg>
+    endif
+    FormatText TextName = label "%t \\c1%u\\c0" t = <trick> u = <user>
+    CreateScreenElement {
+    type = ContainerElement
+    parent = tetris_tricks_menu
+    dims = (100.0, 20.0)
+    }
+    <entry> = <id>
+    CreateScreenElement {
+    type = TextElement
+    parent = <entry>
+    font = newtrickfont
+    text = <label>
+    not_focusable
+    }
+    if GotParam key_combo
+        if GotParam double_tap
+            <buttons> = (goal_tetris_trick_text_double_tap.<key_combo>)
+        else
+            <buttons> = (goal_tetris_trick_text.<key_combo>)
+        endif
+        CreateScreenElement {
+        type = TextElement
+        parent = <entry>
+        font = small
+        text = <buttons>
+        not_focusable
+        }
+        RunScriptOnScreenElement id = <entry> goal_tetris_add_trick Params = { id = <entry> }
+    else
+        RunScriptOnScreenElement id = <entry> goal_tetris_add_trick Params = { id = <entry> no_key_combo }
+    endif
+    <entry>: SetTags trick = <trick> baseline = <baseline> removing = 0 last_occ = <baseline>
+endscript
+
+// Which key combo is this trick (by display name) bound to? For each air/lip
+// slot, GoalManager_GetTrickFromKeyCombo returns the slot trick's name
+// (trick_string) and its double-tap trick's name (extra_trick_string, e.g.
+// Method on the Melon slot); then the special slots are checked the same way.
+// Returns key_combo (plus double_tap), or nothing for tricks that aren't in any
+// slot (manuals, grinds); those are shown without buttons. Names are compared
+// as checksums (case-insensitive, and local strings vs strings don't compare).
+script doakickflip_find_key_combo
+    FormatText ChecksumName = want "%s" s = <trick>
+    GetArraySize doakickflip_key_combos
+    <i> = 0
+    begin
+        <combo> = (doakickflip_key_combos [ <i> ])
+        RemoveParameter trick_string
+        RemoveParameter extra_trick_string
+        GoalManager_GetTrickFromKeyCombo key_combo = <combo>
+        if GotParam trick_string
+            FormatText ChecksumName = have "%s" s = <trick_string>
+            if (<want> = <have>)
+                return key_combo = <combo>
+            endif
+        endif
+        if GotParam extra_trick_string
+            if StructureContains structure = (goal_tetris_trick_text_double_tap) <combo>
+                FormatText ChecksumName = have "%s" s = <extra_trick_string>
+                if (<want> = <have>)
+                    return key_combo = <combo> double_tap
+                endif
+            endif
+        endif
+        <i> = (<i> + 1)
+    repeat <array_size>
+    GetArraySize doakickflip_special_key_combos
+    <i> = 0
+    begin
+        <combo> = (doakickflip_special_key_combos [ <i> ])
+        RemoveParameter trick_string
+        GoalManager_GetTrickFromKeyCombo special key_combo = <combo>
+        if GotParam trick_string
+            FormatText ChecksumName = have "%s" s = <trick_string>
+            if (<want> = <have>)
+                return key_combo = <combo>
+            endif
+        endif
+        <i> = (<i> + 1)
+    repeat <array_size>
+endscript
+
+doakickflip_key_combos = [
+Air_SquareU Air_SquareD Air_SquareL Air_SquareR
+Air_SquareUL Air_SquareUR Air_SquareDL Air_SquareDR
+Air_CircleU Air_CircleD Air_CircleL Air_CircleR
+Air_CircleUL Air_CircleUR Air_CircleDL Air_CircleDR
+Air_U_U_Square Air_D_D_Square Air_L_L_Square Air_R_R_Square
+Air_U_U_Circle Air_D_D_Circle Air_L_L_Circle Air_R_R_Circle
+Lip_TriangleU Lip_TriangleD Lip_TriangleL Lip_TriangleR
+Lip_TriangleUL Lip_TriangleUR Lip_TriangleDL Lip_TriangleDR
+]
+
+doakickflip_special_key_combos = [
+SpAir_D_L_Circle SpAir_D_L_Square SpAir_D_R_Circle SpAir_D_R_Square
+SpAir_D_U_Circle SpAir_D_U_Square SpAir_L_D_Circle SpAir_L_D_Square
+SpAir_L_R_Circle SpAir_L_R_Square SpAir_L_U_Circle SpAir_L_U_Square
+SpAir_R_D_Circle SpAir_R_D_Square SpAir_R_L_Circle SpAir_R_L_Square
+SpAir_R_U_Circle SpAir_R_U_Square SpAir_U_D_Circle SpAir_U_D_Square
+SpAir_U_L_Circle SpAir_U_L_Square SpAir_U_R_Circle SpAir_U_R_Square
+SpGrind_D_L_Triangle SpGrind_D_R_Triangle SpGrind_D_U_Triangle SpGrind_L_D_Triangle
+SpGrind_L_R_Triangle SpGrind_L_U_Triangle SpGrind_R_D_Triangle SpGrind_R_L_Triangle
+SpGrind_R_U_Triangle SpGrind_U_D_Triangle SpGrind_U_L_Triangle SpGrind_U_R_Triangle
+SpLip_D_L_Triangle SpLip_D_R_Triangle SpLip_D_U_Triangle SpLip_L_D_Triangle
+SpLip_L_R_Triangle SpLip_L_U_Triangle SpLip_R_D_Triangle SpLip_R_L_Triangle
+SpLip_R_U_Triangle SpLip_U_D_Triangle SpLip_U_L_Triangle SpLip_U_R_Triangle
+SpLip_U_U_Triangle SpMan_D_L_Triangle SpMan_D_R_Triangle SpMan_D_U_Triangle
+SpMan_L_D_Triangle SpMan_L_R_Triangle SpMan_L_U_Triangle SpMan_R_D_Triangle
+SpMan_R_L_Triangle SpMan_R_U_Triangle SpMan_U_D_Triangle SpMan_U_L_Triangle
+SpMan_U_R_Triangle
+]
+
+script doakickflip_check_done
+    if NOT ScreenElementExists id = tetris_tricks_menu
+        return
+    endif
+    if NOT GetScreenElementChildren id = tetris_tricks_menu
+        return
+    endif
+    GetArraySize <children>
+    if (<array_size> > 0)
+        <i> = 0
+        begin
+            <child> = (<children> [ <i> ])
+            <child>: GetTags
+            if (<removing> = 0)
+                Number_Of_Occurrences = 0
+                GetNumberOfTrickOccurrences TrickText = <trick>
+                if NOT (<Number_Of_Occurrences> = <last_occ>)
+                    <child>: SetTags last_occ = <Number_Of_Occurrences>
+                    if (doakickflip_debug = 1)
+                        FormatText TextName = dbg "occ %t %o (base %b)" t = <trick> o = <Number_Of_Occurrences> b = <baseline>
+                        doakickflip_log line = <dbg>
+                    endif
+                endif
+                if (<Number_Of_Occurrences> > <baseline>)
+                    <child>: SetTags removing = 1
+                    if (doakickflip_debug = 1)
+                        FormatText TextName = dbg "clear %t" t = <trick>
+                        doakickflip_log line = <dbg>
+                    endif
+                    SpawnScript goal_tetris_play_trick_removed_sound
+                    RunScriptOnScreenElement id = <child> goal_tetris_remove_trick Params = { id = <child> }
+                else
+                    // the combo ended (landed or bailed): counts start over
+                    if (<Number_Of_Occurrences> < <baseline>)
+                        <child>: SetTags baseline = <Number_Of_Occurrences>
+                    endif
+                endif
+            endif
+            <i> = (<i> + 1)
+        repeat <array_size>
+    endif
+endscript
+
+// returns pending = number of requests not yet done
+script doakickflip_count_pending
+    <pending> = 0
+    if ScreenElementExists id = tetris_tricks_menu
+        if GetScreenElementChildren id = tetris_tricks_menu
+            GetArraySize <children>
+            if (<array_size> > 0)
+                <i> = 0
+                begin
+                    <child> = (<children> [ <i> ])
+                    <child>: GetTags
+                    if (<removing> = 0)
+                        <pending> = (<pending> + 1)
+                    endif
+                    <i> = (<i> + 1)
+                repeat <array_size>
+            endif
+        endif
+    endif
+    return pending = <pending>
+endscript
+
+// Too many requests piled up: bail and start the list over.
+script doakickflip_overflow
+    doakickflip_log line = "overflow: bail"
+    MakeSkaterGoto YawBail
+    if GetScreenElementChildren id = tetris_tricks_menu
+        GetArraySize <children>
+        if (<array_size> > 0)
+            <i> = 0
+            begin
+                <child> = (<children> [ <i> ])
+                <child>: SetTags removing = 1
+                RunScriptOnScreenElement id = <child> goal_tetris_turn_trick_red Params = { id = <child> }
+                RunScriptOnScreenElement id = <child> goal_tetris_remove_trick Params = { id = <child> }
+                <i> = (<i> + 1)
+            repeat <array_size>
+        endif
     endif
 endscript
