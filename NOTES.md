@@ -344,11 +344,25 @@ QB gotchas found here:
 
 ## Ideas / next steps
 
+**Next up: only accept tricks the skater can actually do** (decided: slots plus
+an allowlist).
+- Accept a request if `doakickflip_find_key_combo` finds it in a normal,
+  double-tap or special slot, **or** it's on an allowlist of always-available
+  moves: manuals, basic grinds, maybe reverts and wallrides. Drop anything
+  else. Rejected requests are dropped silently for now; telling chat needs a
+  channel out of the game, which doesn't exist yet.
+- Open question: **glyphs for grinds.** Grind inputs are relative to the rail
+  (and the stored names carry FS/BS, e.g. `BS 50-50`), so there's no single
+  fixed button combo to show like there is for air tricks. Needs thought: show
+  no glyphs, a generic grind hint, or work out direction-relative glyphs.
+  Related: a "50-50" request should probably match both `FS 50-50` and
+  `BS 50-50` (GetNumberOfTrickOccurrences matches exact names).
+
+Later:
 - Twitch bridge: a separate program that writes the inbox from Twitch chat
   (anonymous IRC read is enough), with name aliases and flood control
   (per-user cooldown, global rate, pending cap).
 - Untested: the red "nearly full" warning in high combo mode.
 - Triple taps (Triple Kickflip = Double Kickflip's own `ExtraTricks`) would
   need walking `ExtraTricks` by hand and a triple-tap glyph string.
-- Grinds: requests like "50-50" should match `FS 50-50` and `BS 50-50`.
 - Compiler: add `switch`/`elseif`/`Random*` so any script can be recompiled.
