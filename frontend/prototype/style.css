@@ -32,6 +32,14 @@
   --twitch-hover: #a76bff;
   --twitch-soft: rgba(145, 70, 255, 0.18);
 
+  /* Alerts (GitHub's alert palette, dark theme): note / tip / important /
+     warning / caution. Caution is for "this won't work until you fix it". */
+  --note: #4493f8;
+  --tip: #3fb950;
+  --important: #ab7df8;
+  --alert-warning: #d29922;
+  --caution: #f85149;
+
   /* Signal */
   --warning: #f0a845;
   --warning-soft: rgba(240, 168, 69, 0.13);
@@ -113,43 +121,19 @@ a {
   letter-spacing: 0.22em;
 }
 
-/* the mark: a deck that kickflips now and then */
 .brand-mark {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
   color: var(--gold);
   filter: drop-shadow(0 0 8px rgba(242, 182, 50, 0.35));
-  animation: kickflip 6s ease-in-out infinite;
 }
 
-@keyframes kickflip {
-  0%, 78% { transform: rotate(-18deg) rotateX(0deg); }
-  86% { transform: rotate(-18deg) translateY(-5px) rotateX(180deg); }
-  94%, 100% { transform: rotate(-18deg) rotateX(360deg); }
-}
-
-/* grind rail divider */
-.rail-divider {
-  position: relative;
-  height: 10px;
+.divider {
+  height: 0;
   margin: 0.85rem 0.35rem 1rem;
   border-top: 2px solid rgba(242, 182, 50, 0.55);
-  opacity: 0.8;
 }
-
-.rail-divider::before,
-.rail-divider::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  width: 2px;
-  height: 8px;
-  background: rgba(242, 182, 50, 0.45);
-}
-
-.rail-divider::before { left: 18%; }
-.rail-divider::after { right: 18%; }
 
 .nav {
   display: flex;
@@ -170,9 +154,25 @@ a {
   transition: background 0.15s ease, color 0.15s ease;
 }
 
-.nav-item svg {
-  width: 19px;
-  height: 19px;
+/* Material Symbols (Google Fonts for the prototype; the material-symbols npm
+   package later). Use by name: <span class="icon">settings</span> */
+.icon {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+.nav-item .icon {
   flex-shrink: 0;
   opacity: 0.85;
 }
@@ -188,33 +188,41 @@ a {
   box-shadow: inset 3px 0 0 var(--gold);
 }
 
-.nav-item.active svg {
-  color: var(--gold);
+/* brand logo in place of a Material icon (Twitch) */
+.nav-brand {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  font-size: 17px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.nav-item.active .nav-brand {
+  color: var(--twitch-hover);
   opacity: 1;
 }
 
-.sidebar-status {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  padding: 0.85rem 0.7rem 0.35rem;
-  margin-top: 0.5rem;
-  border-top: 1px solid var(--border);
-}
-
-.status-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.status-chip .note {
+/* small state marker at the end of a nav item: Twitch connection, or a
+   setup problem on Settings */
+.nav-item .icon.nav-state {
   margin-left: auto;
-  font-size: 0.74rem;
-  color: var(--text-muted);
+  font-size: 18px;
+  opacity: 1;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+.nav-item .icon.nav-state.off,
+.nav-item.active .icon.nav-state.off { color: var(--text-muted); }
+.nav-item .icon.nav-state.ok,
+.nav-item.active .icon.nav-state.ok { color: var(--green); }
+.nav-item .icon.nav-state.caution,
+.nav-item.active .icon.nav-state.caution { color: var(--caution); }
+
+.nav-item.active .icon {
+  color: var(--gold);
+  opacity: 1;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
 }
 
 /* ── Content ───────────────────────────────────────────────────────── */
@@ -322,7 +330,7 @@ code,
   font-size: 0.85em;
 }
 
-/* ── Status line & dots ────────────────────────────────────────────── */
+/* ── Status line ───────────────────────────────────────────────────── */
 .status-line {
   display: flex;
   align-items: center;
@@ -331,32 +339,12 @@ code,
   font-weight: 600;
 }
 
-.dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  display: inline-block;
-  flex-shrink: 0;
-  background: #4c525c;
-}
-
-.dot-on {
-  background: var(--green);
-  animation: pulse 2.4s ease-out infinite;
-}
-
-.dot-warn {
-  background: var(--warning);
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(123, 226, 123, 0.5); }
-  70%, 100% { box-shadow: 0 0 0 7px rgba(123, 226, 123, 0); }
+.state-icon {
+  font-size: 18px;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dot-on,
-  .brand-mark,
   .page {
     animation: none;
   }
@@ -981,4 +969,13 @@ input[type="range"] {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+}
+
+a.link {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+a.link:hover {
+  text-decoration: underline;
 }
