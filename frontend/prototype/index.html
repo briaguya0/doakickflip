@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>doakickflip · Dashboard</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/fontawesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/brands.min.css">
   <link rel="stylesheet" href="style.css">
@@ -49,13 +49,17 @@
   <main class="content">
     <div class="page">
       <h1>Dashboard</h1>
-      <p class="page-hint">What chat is asking for, what you've landed, and whether everything's hooked up.</p>
 
       <div class="card-grid">
         <div class="card">
           <h2>Game</h2>
-          <p class="status-line"><span class="icon state-icon ok">check_circle</span>Inbox reachable</p>
-          <p class="muted small">THUG Pro found, mod installed. Requests go to <code>User/Data/doakickflip/inbox.qb</code>.</p>
+          <ul class="checks">
+            <!-- one line for THUG Pro: red "THUG Pro not found" if missing, yellow if the version isn't the one the mod was built for, green "THUG Pro 0.6.0.11" otherwise -->
+            <li class="check warn"><span class="icon">warning</span><span class="what">THUG Pro 0.6.0.12</span><span class="why">untested (built for 0.6.0.11)</span></li>
+            <li class="check bad"><span class="icon">error</span><span class="what">Mod not installed</span><a class="why link" href="settings.html">Install</a></li>
+            <!-- whether yells can reach the game (the app can write where the mod reads); problem shows the reason, e.g. folder is read-only -->
+            <li class="check skip"><span class="icon">radio_button_unchecked</span><span class="what">Yells <span class="icon flow-arrow" aria-label="to">arrow_forward</span> Game</span><span class="why">checked once the mod is installed</span></li>
+          </ul>
         </div>
         <div class="card">
           <h2><span class="brand-icon twitch"><i class="fa-brands fa-twitch" aria-hidden="true"></i></span>Twitch</h2>
@@ -63,61 +67,20 @@
           <p class="muted small">Connect to let chat send tricks.</p>
           <a class="btn btn-twitch btn-sm" href="twitch.html"><i class="fa-brands fa-twitch" aria-hidden="true"></i> Connect Twitch</a>
         </div>
-        <div class="card">
-          <h2>Stack</h2>
-          <div class="stat"><strong>5</strong><span class="muted">of 8 before you bail</span></div>
-          <div class="meter">
-            <span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span>
-          </div>
-        </div>
       </div>
 
       <div class="card">
-        <h2>On the stack <span class="aside">what the game is showing right now</span></h2>
-        <ul class="stack">
-          <li class="done">
-            <span class="glyphs"><span class="dir l"></span><span class="plus">+</span><span class="btn-x">X</span></span>
-            <span class="trick">Kickflip</span>
-            <span class="who">sk8lord12</span>
-          </li>
-          <li>
-            <span class="glyphs"><span class="dir l"></span><span class="plus">+</span><span class="btn-b">B</span><span class="plus">+</span><span class="btn-b">B</span></span>
-            <span class="trick">Method</span>
-            <span class="who">vertgoblin391</span>
-          </li>
-          <li>
-            <span class="glyphs"><span class="dir r"></span><span class="dir d"></span><span class="plus">+</span><span class="btn-b">B</span></span>
-            <span class="trick">The 900</span>
-            <span class="who">tonyenjoyer32</span>
-          </li>
-          <li>
-            <span class="glyphs"></span>
-            <span class="trick">Nose Manual</span>
-            <span class="who">bailking7</span>
-          </li>
-          <li>
-            <span class="glyphs"><span class="dir r"></span><span class="plus">+</span><span class="btn-x">X</span></span>
-            <span class="trick">Heelflip</span>
-            <span class="who">you</span>
-          </li>
-          <li>
-            <span class="glyphs"><span class="dir u"></span><span class="plus">+</span><span class="btn-b">B</span></span>
-            <span class="trick">Indy</span>
-            <span class="who">combokid365</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h2>Session log <span class="aside">newest first</span></h2>
-        <ul class="log">
-          <li><span class="badge badge-done">done</span><span><strong>Kickflip</strong> <span class="muted">for sk8lord12, mid-combo</span></span><span class="time">20:41:07</span></li>
-          <li><span class="badge badge-chat">chat</span><span><strong>Indy</strong> <span class="muted">from combokid365 · !indy</span></span><span class="time">20:41:02</span></li>
-          <li><span class="badge badge-test">test</span><span><strong>Heelflip</strong> <span class="muted">sent from the test bench</span></span><span class="time">20:40:55</span></li>
-          <li><span class="badge badge-drop">dropped</span><span><strong>Christ Air</strong> <span class="muted">from railrat · not in your slots</span></span><span class="time">20:40:51</span></li>
-          <li><span class="badge badge-sim">sim</span><span><strong>Nose Manual</strong> <span class="muted">from bailking7 (fake chat)</span></span><span class="time">20:40:44</span></li>
-          <li><span class="badge badge-bail">bail</span><span><strong>Stack overflowed</strong> <span class="muted">9 pending, list cleared</span></span><span class="time">20:39:12</span></li>
-        </ul>
+        <h2>Session log</h2>
+        <table class="log-table">
+          <tbody>
+            <tr><td class="time">20:41:02</td><td><span class="badge badge-chat">chat</span></td><td><span class="chat-user"><span class="icon chat-badge sub" title="Subscriber">star</span><span class="chat-name" style="color:#1e90ff">combokid365</span></span></td><td class="cmd"><code>!indy</code></td><td><span class="trick-cell"><span class="glyphs"><span class="icon arrow" aria-label="north">north</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"></span><strong>Indy</strong></span></td></tr>
+            <tr><td class="time">20:40:58</td><td><span class="badge badge-chat">chat</span></td><td><span class="chat-user"><span class="icon chat-badge mod" title="Moderator">swords</span><span class="icon chat-badge sub" title="Subscriber">star</span><span class="chat-name" style="color:#00ff7f">ModSk8r</span></span></td><td class="cmd"><code>!melon</code></td><td><span class="trick-cell"><span class="glyphs"><span class="icon arrow" aria-label="west">west</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"></span><strong>Melon</strong></span></td></tr>
+            <tr><td class="time">20:40:55</td><td><span class="badge badge-test">test</span></td><td><span class="chat-user"><span class="chat-name">you</span></span></td><td class="cmd"><span class="muted">—</span></td><td><span class="trick-cell"><span class="glyphs"><span class="icon arrow" aria-label="east">east</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_x_blue.svg" alt="X"></span><strong>Heelflip</strong></span></td></tr>
+            <tr><td class="time">20:40:51</td><td><span class="badge badge-chat">chat</span></td><td><span class="chat-user"><span class="icon chat-badge vip" title="VIP">diamond</span><span class="chat-name" style="color:#ff4500">sk8lord12</span></span></td><td class="cmd"><code>!kf</code></td><td><span class="trick-cell"><span class="glyphs"><span class="icon arrow" aria-label="west">west</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_x_blue.svg" alt="X"></span><strong>Kickflip</strong></span></td></tr>
+            <tr><td class="time">20:40:44</td><td><span class="badge badge-sim">sim</span></td><td><span class="chat-user"><span class="chat-name" style="color:#daa520">bailking7</span></span></td><td class="cmd"><code>!nosemanual</code></td><td><span class="trick-cell"><span class="glyphs"><span class="icon arrow" aria-label="south">south</span><span class="icon arrow" aria-label="north">north</span></span><strong>Nose Manual</strong></span></td></tr>
+            <tr><td class="time">20:40:30</td><td><span class="badge badge-sim">sim</span></td><td><span class="chat-user"><span class="chat-name" style="color:#9acd32">vertgoblin391</span></span></td><td class="cmd"><code>!method</code></td><td><span class="trick-cell"><span class="glyphs"><span class="icon arrow" aria-label="west">west</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"></span><strong>Method</strong></span></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </main>

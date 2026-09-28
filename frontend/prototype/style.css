@@ -248,6 +248,11 @@ a {
   letter-spacing: -0.01em;
 }
 
+/* a heading without a subtitle needs the subtitle's spacing itself */
+.page h1:not(:has(+ .page-hint)) {
+  margin-bottom: 1.5rem;
+}
+
 .page-hint {
   color: var(--text-muted);
   margin: 0 0 1.75rem;
@@ -706,17 +711,27 @@ input[type="range"] {
   white-space: nowrap;
 }
 
-/* direction: a white arrow (like the in-game prompts); .l .r .u .d rotate it */
-.glyphs .dir {
-  display: inline-block;
-  width: 1.25em;
-  height: 1.25em;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M2 10 9 3v4h9v6H9v4z' fill='%23f2f3f5' stroke='%231a1d22' stroke-width='1.2' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+/* direction: Material Symbols arrow (west / east / north / south / north_west
+   ...), heavy and white with a dark edge, like the in-game prompts */
+.glyphs .arrow {
+  font-size: 1.3em;
+  color: #f2f3f5;
+  font-variation-settings: "FILL" 1, "wght" 700, "GRAD" 200, "opsz" 24;
+  text-shadow: 0 1px 0 #000, 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
-.glyphs .dir.r { transform: rotate(180deg); }
-.glyphs .dir.u { transform: rotate(90deg); }
-.glyphs .dir.d { transform: rotate(-90deg); }
+/* face buttons: SVGs from Mr. Breakfast's Free Prompts (CC0) */
+.face-glyph {
+  width: 1.35em;
+  height: 1.35em;
+  vertical-align: middle;
+}
+
+/* two directions in a row (specials, manuals) get a little space, like the
+   in-game special tricks list */
+.glyphs .arrow + .arrow {
+  margin-left: 0.3em;
+}
 
 .glyphs .plus {
   color: var(--text-muted);
@@ -807,6 +822,13 @@ input[type="range"] {
 .log .badge {
   width: 4.2rem;
   text-align: center;
+}
+
+/* button combo column: fixed width so trick names line up */
+.log .glyphs {
+  width: 6.5rem;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .log .time {
@@ -978,4 +1000,233 @@ a.link {
 
 a.link:hover {
   text-decoration: underline;
+}
+
+/* ── Button prompt style picker (settings) ─────────────────────────── */
+.prompt-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.6rem;
+}
+
+.prompt-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.prompt-option > input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.prompt-option:has(> input:checked) {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+
+.prompt-option:has(> input:focus-visible) {
+  box-shadow: var(--ring);
+}
+
+.prompt-name {
+  font-weight: 800;
+}
+
+.prompt-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.prompt-preview > span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.face {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: #2a2e36;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.ps-square { color: #e58ad7; }
+.ps-circle { color: #ff5a5a; }
+.ps-triangle { color: #3fd9b0; }
+.ps-cross { color: #7ab2ff; }
+.xb-x { color: #4a9dff; }
+.xb-b { color: #ff5a5a; }
+.xb-y { color: #f5c518; }
+.xb-a { color: #5ed15e; }
+
+/* generic: PromptFont's positional glyphs (a diamond of four with one filled) */
+@font-face {
+  font-family: "PromptFont";
+  src: url("fonts/promptfont.otf") format("opentype");
+}
+
+.pf {
+  font-family: "PromptFont";
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--text);
+}
+
+.custom-fields input[type="text"] {
+  width: 2.6rem;
+  padding: 0.2rem 0.3rem;
+  text-align: center;
+}
+
+/* ── Session log table ─────────────────────────────────────────────── */
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.log-table th {
+  text-align: left;
+  padding: 0 0.6rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.log-table td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.log-table tr:last-child td {
+  border-bottom: none;
+}
+
+.log-table th:first-child,
+.log-table td:first-child {
+  padding-left: 0.1rem;
+}
+
+.log-table .time {
+  color: var(--text-muted);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.log-table .cmd code {
+  color: var(--text);
+}
+
+.log-table td:last-child {
+  width: 100%;
+}
+
+.trick-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.trick-cell .glyphs {
+  width: 7rem;
+  justify-content: flex-end;
+}
+
+/* chat user, styled like Twitch chat: badges then the name in the user's colour.
+   Badge icons here are placeholders, not Twitch's badge artwork. */
+.chat-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.chat-name {
+  font-weight: 700;
+}
+
+.chat-badge {
+  font-size: 15px;
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 3px;
+  color: #fff;
+  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 20;
+}
+
+.chat-badge.broadcaster { background: #e91916; }
+.chat-badge.mod { background: #00ad03; }
+.chat-badge.vip { background: #e005b9; }
+.chat-badge.sub { background: #8205b4; }
+
+/* ── Setup checks (dashboard game card) ────────────────────────────── */
+.checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.check .icon {
+  font-size: 19px;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+.check .what {
+  font-weight: 600;
+}
+
+.check .why {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.check.ok .icon { color: var(--tip); }
+.check.warn .icon { color: var(--alert-warning); }
+.check.bad .icon { color: var(--caution); }
+.check.skip .icon { color: var(--border-strong); }
+.check.skip .what { color: var(--text-muted); }
+
+.check a.why {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+/* the arrow inside a check label ("Yells -> Game") */
+.check .what .flow-arrow {
+  font-size: 16px;
+  vertical-align: -3px;
+  color: inherit;
+  font-variation-settings: "FILL" 0, "wght" 600, "GRAD" 0, "opsz" 20;
 }
