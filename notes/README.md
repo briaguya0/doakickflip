@@ -9,6 +9,7 @@ Versions this was worked out against: THUG Pro 0.6.0.11 (`changelog.txt`) on a
 retail PC THUG2 install.
 
 - [todo.md](todo.md): what's next and open questions
+- [frontend.md](frontend.md): the app's UI: where the prototype is, decisions, next steps
 - [high-combo-mode.md](high-combo-mode.md): how the current mode works
 - [qb-gotchas.md](qb-gotchas.md): QB scripting pitfalls
 - [running.md](running.md): launching, logging, finding crashes

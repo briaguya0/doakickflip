@@ -23,10 +23,6 @@
         <span class="icon" aria-hidden="true">space_dashboard</span>
         <span>Dashboard</span>
       </a>
-      <a class="nav-item" href="test.html">
-        <span class="icon" aria-hidden="true">science</span>
-        <span>Test bench</span>
-      </a>
       <a class="nav-item" href="tricks.html">
         <span class="icon" aria-hidden="true">skateboarding</span>
         <span>Tricks</span>
@@ -81,6 +77,56 @@
             <tr><td class="time">20:40:30</td><td><span class="badge badge-sim">sim</span></td><td><span class="chat-user"><span class="chat-name" style="color:#9acd32">vertgoblin391</span></span></td><td class="cmd"><code>!method</code></td><td><span class="trick-cell"><span class="glyphs"><span class="icon arrow" aria-label="west">west</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"></span><strong>Method</strong></span></td></tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- testing tools: only shown when Settings > Testing > "Show testing tools" is on -->
+      <div class="two-column">
+        <div class="card">
+          <h2>Send a trick</h2>
+          <label class="field">From
+            <input type="text" value="you">
+          </label>
+          <label class="field">Trick <span class="hint">Exact in-game name. Tricks you don't have in a slot are dropped by the game.</span>
+            <div class="input-row">
+              <input type="text" placeholder="e.g. Varial Kickflip">
+              <button>Send</button>
+            </div>
+          </label>
+          <div class="section-label">Quick send</div>
+          <div class="pick-grid">
+            <button class="pick">Kickflip <span class="glyphs"><span class="icon arrow" aria-label="west">west</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_x_blue.svg" alt="X"></span></button>
+            <button class="pick">Heelflip <span class="glyphs"><span class="icon arrow" aria-label="east">east</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_x_blue.svg" alt="X"></span></button>
+            <button class="pick">Melon <span class="glyphs"><span class="icon arrow" aria-label="west">west</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"></span></button>
+            <button class="pick">Method <span class="glyphs"><span class="icon arrow" aria-label="west">west</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"></span></button>
+            <button class="pick">The 900 <span class="glyphs"><span class="icon arrow" aria-label="east">east</span><span class="icon arrow" aria-label="south">south</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_b_red.svg" alt="B"></span></button>
+            <button class="pick">Manual <span class="glyphs"><span class="icon arrow" aria-label="north">north</span><span class="icon arrow" aria-label="south">south</span></span></button>
+          </div>
+          <div class="btn-row">
+            <button class="btn-ghost btn-sm">Send 3 random</button>
+            <button class="btn-ghost btn-sm">Fill to red (75%)</button>
+            <button class="btn-danger btn-sm">Overflow (bail)</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Fake chat
+            <span class="aside"><label class="toggle"><input type="checkbox" checked><i></i></label></span>
+          </h2>
+          <p class="status-line"><span class="icon state-icon ok">check_circle</span>Running · 12 viewers</p>
+          <div class="range-label">Rate <span>10 / min</span></div>
+          <input type="range" min="1" max="60" value="10">
+          <p class="muted small">Random gaps between requests, like real chat.</p>
+          <div class="range-label">Bursts <span>15%</span></div>
+          <input type="range" min="0" max="100" value="15">
+          <p class="muted small">Chance a request brings 1–3 more at once.</p>
+          <div class="section-label">Trick pool</div>
+          <div class="chips">
+            <span class="chip">Kickflip</span><span class="chip">Heelflip</span><span class="chip">Impossible</span>
+            <span class="chip">Pop Shove-It</span><span class="chip">Melon</span><span class="chip">Indy</span>
+            <span class="chip">Method</span><span class="chip off">Christ Air</span><span class="chip">Manual</span>
+            <span class="chip">Nose Manual</span><span class="chip off">BS 50-50</span><span class="chip">+ add</span>
+          </div>
+        </div>
       </div>
     </div>
   </main>

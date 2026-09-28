@@ -1,5 +1,8 @@
 # Next steps
 
+**Current focus: the frontend.** Reviewing the static prototype page by page;
+see [frontend.md](frontend.md) for where it stands and what's next.
+
 **To discuss: what happens on overflow.** The bail rule stays (more than
 `max_pending` pending makes you bail). Open question: should the list also
 clear?
