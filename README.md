@@ -52,5 +52,5 @@ The mod source is `mod/doakickflip.q`. `build_mod.py` appends it to the pause
 menu script and inserts one call into the free skate section. While the mode
 is on, the game polls `User/Data/doakickflip/inbox.qb` for requests.
 
-See [NOTES.md](NOTES.md) for file formats, how the Skate-Tricks goal works, and
+See [notes/](notes/README.md) for file formats, how the Skate-Tricks goal works, and
 the debugging trail.

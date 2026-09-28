@@ -138,6 +138,10 @@ class Compiler:
             elif kind == 'float':
                 self.b += b'\x1a' + struct.pack('<f', float(t))
             elif kind == 'op':
+                if t in ('>=', '<='):
+                    # opcodes exist (0x13/0x15) but no stock script uses them, and a
+                    # condition using >= froze the game; write a > b - 1 instead
+                    raise SyntaxError(f'line {self.lineno}: {t} is not supported by the game; use < / > instead')
                 if t == '(':
                     vals, j = self.number_group(toks, i)
                     if vals:

@@ -5,6 +5,7 @@ Usage:
   call_trick.py --thugpro DIR [--user NAME] TRICK [TRICK ...]   e.g. Kickflip "Pop Shove-It"
   call_trick.py --thugpro DIR                                  read stdin: "Kickflip" or "user: Kickflip"
   call_trick.py --thugpro DIR --reset                          create/clear the inbox
+  call_trick.py --thugpro DIR --max-pending 15                 change the cap (with or without tricks)
 
 Tricks are the game's display names, matched exactly (case included):
 Kickflip, Heelflip, Impossible, Pop Shove-It, Varial Kickflip, Melon, Indy,
@@ -17,6 +18,9 @@ a partial file.
 
 Inbox format (compiled QB), oldest first, seq increasing:
     doakickflip_inbox = [ { seq = N trick = "Kickflip" user = "name" } ... ]
+    doakickflip_inbox_settings = { max_pending = 8 }
+The game re-reads the settings on every poll: more than max_pending tricks
+pending makes the skater bail, and the list turns red from 75% of it.
 """
 import argparse
 import json
@@ -29,6 +33,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import qbc
 
 KEEP = 32  # recent requests kept in the inbox
+DEFAULT_SETTINGS = {'max_pending': 8}
 TRICK = re.compile(r"[A-Za-z0-9][A-Za-z0-9 .'!&-]{0,39}")
 USER = re.compile(r'[A-Za-z0-9_]{1,25}')
 
@@ -51,6 +56,13 @@ class Inbox:
             self.state = {'seq': 0, 'requests': []}
         # entries from the key-combo era of the format don't carry a trick name
         self.state['requests'] = [r for r in self.state['requests'] if 'trick' in r]
+        self.state['settings'] = {**DEFAULT_SETTINGS, **self.state.get('settings', {})}
+
+    def set_max_pending(self, n):
+        if not 1 <= n <= 30:
+            raise ValueError('max pending must be 1-30 (the list has 30 slots at most)')
+        self.state['settings']['max_pending'] = n
+        self.write()
 
     def reset(self):
         # keep seq increasing so a running game never sees an old number again
@@ -71,6 +83,7 @@ class Inbox:
         for r in self.state['requests']:
             lines.append(f"{{ seq = {r['seq']} trick = \"{r['trick']}\" user = \"{r['user']}\" }}")
         lines.append(']')
+        lines.append(f"doakickflip_inbox_settings = {{ max_pending = {int(self.state['settings']['max_pending'])} }}")
         data = qbc.compile_text('\n'.join(lines) + '\n')
         tmp = self.qb + '.tmp'
         with open(tmp, 'wb') as f:
@@ -91,10 +104,19 @@ def main():
     ap.add_argument('--thugpro', required=True)
     ap.add_argument('--user', default='you')
     ap.add_argument('--reset', action='store_true')
+    ap.add_argument('--max-pending', type=int, help='bail when more than this many tricks are pending (default 8)')
     ap.add_argument('tricks', nargs='*')
     args = ap.parse_args()
 
     inbox = Inbox(args.thugpro)
+    if args.max_pending is not None:
+        try:
+            inbox.set_max_pending(args.max_pending)
+        except ValueError as e:
+            sys.exit(str(e))
+        print(f'max pending: {args.max_pending}')
+        if not args.tricks and not args.reset:
+            return
     if args.reset:
         inbox.reset()
         print(f'inbox cleared: {inbox.qb}')

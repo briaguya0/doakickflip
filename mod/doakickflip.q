@@ -7,6 +7,8 @@
 // THUG Pro's file redirect resolves to <THUG Pro>\User\Data\doakickflip\inbox.qb
 // (tools/call_trick.py and tools/fake_chat.py write it):
 //     doakickflip_inbox = [ { seq = N trick = "Kickflip" user = "name" } ... ]
+//     doakickflip_inbox_settings = { max_pending = 8 }
+// The settings are re-read every poll, so the cap can change while playing.
 //
 // A request clears as soon as the trick is done, mid-combo: every frame we ask
 // how many times the trick is in the current combo (GetNumberOfTrickOccurrences,
@@ -14,7 +16,7 @@
 // against the count when the request came in. It's a global function (it finds
 // the skater itself); called as "skater: GetNumberOfTrickOccurrences" its
 // result never reaches our script. If
-// more than doakickflip_max_pending requests pile up, the skater bails and the
+// more than max_pending requests pile up, the skater bails and the
 // list clears. The score is just the normal combo score.
 //
 // Each request is an entry in the stock tetris_tricks_menu, tagged with
@@ -22,7 +24,6 @@
 
 doakickflip_active = 0
 doakickflip_last_seq = 0
-doakickflip_max_pending = 8
 // 1 = show a debug overlay (top left, drawn above the pause menu): the last
 // few events, then one line per entry with its count, baseline and position.
 // Pause to freeze it for a screenshot.
@@ -213,11 +214,14 @@ script doakickflip_take_new_requests
         repeat <array_size>
     endif
     doakickflip_count_pending
-    if (<pending> > doakickflip_max_pending)
+    <max> = ((doakickflip_inbox_settings).max_pending)
+    if (<pending> > <max>)
         doakickflip_overflow
     else
-        // like the stock stack: red when it's about to overflow
-        if (<pending> > (doakickflip_max_pending - 2))
+        // like the stock Skate-Tricks stack: red from 75% of the cap
+        // (pending * 4 >= max * 3, written with > because the game's scripts
+        // never use >= / <= and using >= froze the game)
+        if ((<pending> * 4) > ((<max> * 3) - 1))
             doakickflip_color_pending color_script = goal_tetris_turn_trick_red
         else
             doakickflip_color_pending color_script = goal_tetris_turn_trick_white

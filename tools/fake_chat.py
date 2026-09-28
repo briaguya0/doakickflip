@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pretend to be Twitch chat: send random trick requests to "Do a Kickflip!".
 
-Usage: fake_chat.py --thugpro DIR [--rate N] [--burst P] [--tricks A,B,...] [--seed S]
+Usage: fake_chat.py --thugpro DIR [--rate N] [--burst P] [--tricks A,B,...] [--max-pending N] [--seed S]
 
 Start it, then skate: requests arrive at random (on average --rate per minute),
 from random made-up users, and now and then several at once (--burst is the
@@ -38,6 +38,7 @@ def main():
     ap.add_argument('--rate', type=float, default=10, help='average requests per minute (default 10)')
     ap.add_argument('--burst', type=float, default=0.15, help='chance a request comes with 1-3 more (default 0.15)')
     ap.add_argument('--tricks', help='comma-separated trick names (default: common flips/grabs/manuals)')
+    ap.add_argument('--max-pending', type=int, help='also set the cap (bail when more are pending)')
     ap.add_argument('--seed', type=int)
     args = ap.parse_args()
 
@@ -45,6 +46,8 @@ def main():
     tricks = [t.strip() for t in args.tricks.split(',')] if args.tricks else DEFAULT_TRICKS
     users = [fake_user(rng) for _ in range(12)]
     inbox = Inbox(args.thugpro)
+    if args.max_pending is not None:
+        inbox.set_max_pending(args.max_pending)
     print(f'fake chat: ~{args.rate:g} requests/min from {len(users)} users, ctrl-c to stop')
     try:
         while True:
