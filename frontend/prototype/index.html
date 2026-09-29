@@ -30,8 +30,8 @@
       <a class="nav-item" href="twitch.html">
         <span class="nav-brand" aria-hidden="true"><i class="fa-brands fa-twitch" aria-hidden="true"></i></span>
         <span>Twitch</span>
-        <!-- connection state: link_off (grey) when disconnected, check_circle (green) when connected -->
-        <span class="icon nav-state off" title="Not connected">link_off</span>
+        <!-- Twitch connection (filled plug): power_off grey = not connected, power blue = connecting, power green = connected, power_off red = error -->
+        <span class="icon nav-state off" title="Not connected">power_off</span>
       </a>
       <a class="nav-item" href="settings.html">
         <span class="icon" aria-hidden="true">settings</span>
@@ -46,22 +46,44 @@
     <div class="page">
       <h1>Dashboard</h1>
 
-      <div class="card-grid">
-        <div class="card">
-          <h2>Game</h2>
-          <ul class="checks">
-            <!-- one line for THUG Pro: red "THUG Pro not found" if missing, yellow if the version isn't the one the mod was built for, green "THUG Pro 0.6.0.11" otherwise -->
-            <li class="check warn"><span class="icon">warning</span><span class="what">THUG Pro 0.6.0.12</span><span class="why">untested (built for 0.6.0.11)</span></li>
-            <li class="check bad"><span class="icon">error</span><span class="what">Mod not installed</span><a class="why link" href="settings.html">Install</a></li>
-            <!-- whether yells can reach the game (the app can write where the mod reads); problem shows the reason, e.g. folder is read-only -->
-            <li class="check skip"><span class="icon">radio_button_unchecked</span><span class="what">Yells <span class="icon flow-arrow" aria-label="to">arrow_forward</span> Game</span><span class="why">checked once the mod is installed</span></li>
-          </ul>
+      <div class="dash-top">
+        <div class="card control">
+          <h2>Quick settings</h2>
+          <div class="setting-row">
+            <div class="text"><strong>Enabled</strong></div>
+            <label class="toggle"><input type="checkbox" checked><i></i></label>
+          </div>
+          <div class="setting-row">
+            <div class="text"><strong>Trick clears</strong></div>
+            <div class="segmented">
+              <label><input type="radio" name="clears" checked><span>Immediate</span></label>
+              <label><input type="radio" name="clears"><span>Landed</span></label>
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="text"><strong>Stack limit</strong></div>
+            <input type="number" value="8">
+          </div>
+          <div class="setting-row">
+            <div class="text"><strong>Per-viewer cooldown</strong><span>seconds</span></div>
+            <input type="number" value="20">
+          </div>
+          <div class="setting-row">
+            <div class="text"><strong>Same trick twice</strong></div>
+            <label class="toggle"><input type="checkbox"><i></i></label>
+          </div>
         </div>
-        <div class="card">
-          <h2><span class="brand-icon twitch"><i class="fa-brands fa-twitch" aria-hidden="true"></i></span>Twitch</h2>
-          <p class="status-line"><span class="icon state-icon off">do_not_disturb_on</span>Not connected</p>
-          <p class="muted small">Connect to let chat send tricks.</p>
-          <a class="btn btn-twitch btn-sm" href="twitch.html"><i class="fa-brands fa-twitch" aria-hidden="true"></i> Connect Twitch</a>
+
+        <div class="card status">
+          <h2>Status</h2>
+          <ul class="checks">
+            <!-- THUG Pro: red "not found" / yellow untested version / green ok -->
+            <li class="check ok"><span class="icon">check_circle</span><span class="what">THUG Pro 0.6.0.11</span></li>
+            <li class="check ok"><span class="icon">check_circle</span><span class="what">Mod installed</span></li>
+            <li class="check ok"><span class="icon">check_circle</span><span class="what">Yells <span class="icon flow-arrow" aria-label="to">arrow_forward</span> Game</span></li>
+            <!-- Twitch: filled plug; power_off grey = not connected, power blue = connecting, power green = connected, power_off red = error -->
+            <li class="check off"><span class="icon">power_off</span><span class="what">Twitch</span><a class="why link" href="twitch.html">Connect</a></li>
+          </ul>
         </div>
       </div>
 

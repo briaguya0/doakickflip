@@ -215,7 +215,9 @@ a {
 .nav-item .icon.nav-state.off,
 .nav-item.active .icon.nav-state.off { color: var(--text-muted); }
 .nav-item .icon.nav-state.ok,
-.nav-item.active .icon.nav-state.ok { color: var(--green); }
+.nav-item.active .icon.nav-state.ok { color: var(--tip); }
+.nav-item .icon.nav-state.connecting,
+.nav-item.active .icon.nav-state.connecting { color: var(--note); }
 .nav-item .icon.nav-state.caution,
 .nav-item.active .icon.nav-state.caution { color: var(--caution); }
 
@@ -343,6 +345,13 @@ code,
   margin: 0 0 0.4rem;
   font-weight: 600;
 }
+
+/* status icon colours: same palette as the setup checks */
+.state-icon.off { color: var(--text-muted); }
+.state-icon.ok { color: var(--tip); }
+.state-icon.connecting { color: var(--note); }
+.state-icon.connected { color: var(--tip); }
+.state-icon.lost { color: var(--caution); }
 
 .state-icon {
   font-size: 18px;
@@ -1179,6 +1188,45 @@ a.link:hover {
 .chat-badge.vip { background: #e005b9; }
 .chat-badge.sub { background: #8205b4; }
 
+/* segmented control: a few mutually exclusive options as one pill */
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+}
+
+.segmented label {
+  position: relative;
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.segmented span {
+  display: block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.segmented input:checked + span {
+  background: var(--gold);
+  color: var(--gold-ink);
+}
+
+.segmented input:focus-visible + span {
+  box-shadow: var(--ring);
+}
+
 /* ── Setup checks (dashboard game card) ────────────────────────────── */
 .checks {
   list-style: none;
@@ -1229,4 +1277,52 @@ a.link:hover {
   vertical-align: -3px;
   color: inherit;
   font-variation-settings: "FILL" 0, "wght" 600, "GRAD" 0, "opsz" 20;
+}
+
+/* ── Dashboard top: control card + thin status card ──────────────── */
+.dash-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 1.25rem;
+  align-items: stretch;
+  margin-bottom: 1.5rem;
+}
+
+.dash-top .card {
+  margin-bottom: 0;
+}
+
+.control-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding-bottom: 0.4rem;
+}
+
+.control-head h2 {
+  margin: 0;
+}
+
+.control-head .toggle {
+  margin-left: auto;
+}
+
+.control .setting-row input[type="number"],
+.control .setting-row select {
+  width: 11rem;
+}
+
+.check.off .icon {
+  color: var(--text-muted);
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+@media (max-width: 760px) {
+  .dash-top {
+    grid-template-columns: 1fr;
+  }
+}
+
+.control .setting-row {
+  padding: 0.55rem 0;
 }
