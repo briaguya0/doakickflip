@@ -91,6 +91,26 @@
           <div class="text"><strong>Show testing tools</strong><span>Send tricks yourself and run fake chat from the dashboard.</span></div>
           <label class="toggle"><input type="checkbox" checked><i></i></label>
         </div>
+        <div class="setting-row">
+          <div class="text"><strong>Quick-send trick</strong><span>The trick button on the dashboard's Send a trick card.</span></div>
+          <select><option selected>Kickflip</option><option>Heelflip</option><option>Melon</option><option>The 900</option></select>
+        </div>
+        <div class="section-label">Fake chat</div>
+        <div class="setting-row">
+          <div class="text"><strong>Bursts</strong><span>Chance a yell brings 1–3 more at once.</span></div>
+          <div class="range-inline"><input type="range" min="0" max="100" value="15"><span>15%</span></div>
+        </div>
+        <div class="setting-row">
+          <div class="text"><strong>Fake chat yells</strong><span>Only these is kept separate from the Tricks page, so testing never changes your real trick setup.</span></div>
+          <div class="segmented">
+            <label><input type="radio" name="fakepool"><span>All allowed tricks</span></label>
+            <label><input type="radio" name="fakepool" checked><span>Only these</span></label>
+          </div>
+        </div>
+        <!-- only shown when "Only these" is selected -->
+        <div class="chips pool-picks">
+          <span class="chip">Kickflip</span><span class="chip">Nose Manual</span><span class="chip">+ add</span>
+        </div>
       </div>
 
       <div class="card">

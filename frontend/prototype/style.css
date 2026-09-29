@@ -1188,6 +1188,76 @@ a.link:hover {
 .chat-badge.vip { background: #e005b9; }
 .chat-badge.sub { background: #8205b4; }
 
+/* a slider with its value, sitting at the end of a setting row */
+.range-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 14rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+/* send a trick: [- n +] x [trick] [random] */
+.send-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.send-row .pick {
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-width: 7rem;
+  min-height: 3.6rem;
+}
+
+.pick-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.times {
+  align-self: center;
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+}
+
+.stepper .step {
+  background: none;
+  color: var(--text-muted);
+  padding: 0.4rem 0.5rem;
+}
+
+.stepper .step:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.stepper .step-count {
+  min-width: 1.8rem;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.pool-picks {
+  padding: 0 0 0.6rem;
+}
+
 /* segmented control: a few mutually exclusive options as one pill */
 .segmented {
   display: inline-flex;
@@ -1325,4 +1395,76 @@ a.link:hover {
 
 .control .setting-row {
   padding: 0.55rem 0;
+}
+
+.send-row {
+  margin-top: 0.9rem;
+}
+
+/* testing cards: same height side by side */
+.two-column.testing {
+  align-items: stretch;
+}
+
+/* fake chat on/off, shaped like the send buttons next to it */
+.fake-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 0.9rem;
+  padding: 0.6rem 0.7rem;
+  min-height: 3.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* small "Running" / "Stopped" readout in a card title */
+.run-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 700;
+}
+
+.run-state .icon {
+  font-size: 18px;
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
+}
+
+.card h2 .run-state.ok { color: var(--tip); }
+.card h2 .run-state.off { color: var(--text-muted); }
+
+/* icon before a card title (e.g. science = testing tools) */
+.card h2 .h2-icon {
+  font-size: 20px;
+  color: var(--text-muted);
+}
+
+/* fake chat start / stop */
+.pick.run-start {
+  color: var(--tip);
+  border-color: rgba(63, 185, 80, 0.5);
+}
+
+.pick.run-start:hover {
+  background: rgba(63, 185, 80, 0.12);
+  border-color: var(--tip);
+}
+
+.pick.run-stop {
+  color: var(--caution);
+  border-color: rgba(248, 81, 73, 0.5);
+}
+
+.pick.run-stop:hover {
+  background: rgba(248, 81, 73, 0.12);
+  border-color: var(--caution);
+}
+
+.pick.run-start .icon,
+.pick.run-stop .icon {
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 20;
 }
