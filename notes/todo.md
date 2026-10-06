@@ -32,6 +32,22 @@ an allowlist).
   Related: a "50-50" request should probably match both `FS 50-50` and
   `BS 50-50` (GetNumberOfTrickOccurrences matches exact names).
 
+**Discovery: what's possible, and what kinds of tricks exist** (for the
+layered allowlist in [frontend.md](frontend.md)).
+- Where THUG Pro keeps saves / created skaters, and whether the trick slot
+  assignments (normal, double tap, special) can be read from them. Goal:
+  fill the "possible" layer without the streamer listing tricks by hand and
+  without reading game memory. Fallback: a config file.
+- Sweep the trick definitions in the extracted QB for every kind of trick,
+  not just normal / double tap / triple tap / special: **flips and rolls**
+  (not accounted for yet), grinds, lips, manuals, reverts, anything else.
+  For each: how the game names it, whether `GetNumberOfTrickOccurrences`
+  counts it, and what glyphs it'd get. This fixes the kind list the
+  per-trigger denylists use.
+- Note the mod can already see slots live (`doakickflip_find_key_combo`), so
+  the game could still drop impossible yells itself; the app-side list is
+  so the app knows before sending (and could tell chat).
+
 Later:
 - Twitch bridge: a separate program that writes the inbox from Twitch chat
   (anonymous IRC read is enough), with name aliases and flood control

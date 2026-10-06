@@ -94,6 +94,39 @@ things moved off the Dashboard but hasn't been reviewed itself yet.
     quick-send trick, fake chat **Bursts**, and **Fake chat yells: All
     allowed tricks / Only these** (a separate short list, so testing one or
     two tricks never changes the real Tricks setup).
+- **Triggers, Sail's model** (not a `!command` per trick, which the prototype
+  still shows on the Tricks page and in the log's command column). One action,
+  **yell a trick**, whose trick is fixed, named by the viewer, or random from
+  what's allowed. Triggers fire it, each with its own cooldown etc.:
+  - **Commands:** the first word matched case-insensitively, the rest
+    available as `{{message}}` / `{{0}}`, `{{1}}`, ...; can require bits
+    (`Cheer100 !doa ...`). Default command: **`!doa {{message}}`**, the
+    message matched against trick names.
+  - **Redeems:** channel point rewards created/edited from the app (name,
+    cost, prompt, "ask the viewer to type something" → `{{message}}`,
+    auto-fulfil or leave in the Twitch queue). Rewards made elsewhere can be
+    bound but not edited (Twitch rule). Needs affiliate/partner. Sail ships
+    no examples here; we want some, e.g. "Yell a special" (text input),
+    "Yell a triple tap", "Random special".
+  - **Events:** follow, sub, resub, gifted subs, cheer (bits: at least /
+    exactly, several bindings per event). Nothing typed, so fixed or random
+    tricks, e.g. a sub yells a random special.
+  - Like Sail's curated commands, ship starters to copy and tweak.
+  - Session log's command column becomes "what fired": `!doa kickflip`, the
+    reward's name, "Cheer 500".
+- **What can be yelled, in layers:**
+  1. **Possible:** what the skater can actually do (slotted tricks plus
+     always-available ones). **No UI for managing it**: managing it by hand
+     would be terrible. Ideally pulled from the game (not live; a save file
+     or similar: needs discovery); failing that, a config file we read.
+  2. **Per trigger:** each command / redeem / event has a **denylist** on top
+     of that, by kind (**normal / double tap / triple tap / special**, plus
+     whatever kinds discovery turns up, e.g. flips/rolls) and by single
+     trick. So anyone can `!doa kickflip`, but specials or triple taps can be
+     kept behind a redeem.
+  - The Tricks page as an editor goes away (no per-trick commands, no
+    managing what's possible). Maybe a read-only view of what's possible;
+    undecided.
 - **Page subtitles:** none.
 - **Icons:** Material Symbols (Apache 2.0) everywhere; Twitch logo from Font
   Awesome Free brands (CC BY 4.0). Twitch's brand rules allow the logo only in
@@ -135,6 +168,11 @@ things moved off the Dashboard but hasn't been reviewed itself yet.
   it's running (beyond its own card).
 - Terminology pass: "yell" everywhere user-facing (Settings' "Inbox" field,
   fake chat text).
-- Review the **Tricks**, **Twitch** and **Settings** pages.
+- Discovery for the "possible" layer and trick kinds: see
+  [todo.md](todo.md).
+- Mock up Commands / Redeems / Events (pages or tabs on Twitch; undecided)
+  with per-trigger denylists; drop the `!command` chips; decide what's left
+  of the Tricks page.
+- Review the **Twitch** and **Settings** pages.
 - Later: pick the real stack (not decided; avoid packaging that Defender
   likes to flag, e.g. PyInstaller-style bundles), then build it.
