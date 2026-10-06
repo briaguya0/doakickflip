@@ -21,9 +21,16 @@ http.server.ThreadingHTTPServer(("127.0.0.1", 8765), H).serve_forever()'
 # http://127.0.0.1:8765/
 ```
 
-Reviewed and settled so far: the **sidebar** and the **Dashboard** (Quick
-settings, Status, session log, testing tools). The Settings page got the
-things moved off the Dashboard but hasn't been reviewed itself yet.
+Reviewed and settled so far: the **sidebar**, the **Dashboard** (Quick
+settings, Status, session log, testing tools) and the **Triggers** page's
+list and command editor. The Settings page got the things moved off the
+Dashboard (and a Reset to defaults card) but hasn't been reviewed itself yet.
+
+Screenshots without a person: headless Chromium (Flatpak) works, e.g.
+`flatpak run --filesystem=/tmp io.github.ungoogled_software.ungoogled_chromium
+--headless=new --disable-gpu --hide-scrollbars --virtual-time-budget=5000
+--window-size=1400,800 --screenshot=/tmp/.../out.png http://127.0.0.1:8765/triggers.html`
+(`--virtual-time-budget` waits out the fade-in and icon font).
 
 ## Decisions so far
 
@@ -94,39 +101,61 @@ things moved off the Dashboard but hasn't been reviewed itself yet.
     quick-send trick, fake chat **Bursts**, and **Fake chat yells: All
     allowed tricks / Only these** (a separate short list, so testing one or
     two tricks never changes the real Tricks setup).
-- **Triggers, Sail's model** (not a `!command` per trick, which the prototype
-  still shows on the Tricks page and in the log's command column). One action,
-  **yell a trick**, whose trick is fixed, named by the viewer, or random from
-  what's allowed. Triggers fire it, each with its own cooldown etc.:
-  - **Commands:** the first word matched case-insensitively, the rest
-    available as `{{message}}` / `{{0}}`, `{{1}}`, ...; can require bits
-    (`Cheer100 !doa ...`). Default command: **`!doa {{message}}`**, the
-    message matched against trick names.
-  - **Redeems:** channel point rewards created/edited from the app (name,
-    cost, prompt, "ask the viewer to type something" → `{{message}}`,
-    auto-fulfil or leave in the Twitch queue). Rewards made elsewhere can be
-    bound but not edited (Twitch rule). Needs affiliate/partner. Sail ships
-    no examples here; we want some, e.g. "Yell a special" (text input),
-    "Yell a triple tap", "Random special".
-  - **Events:** follow, sub, resub, gifted subs, cheer (bits: at least /
-    exactly, several bindings per event). Nothing typed, so fixed or random
-    tricks, e.g. a sub yells a random special.
-  - Like Sail's curated commands, ship starters to copy and tweak.
-  - Session log's command column becomes "what fired": `!doa kickflip`, the
-    reward's name, "Cheer 500".
+- **Triggers, Sail's model** (no `!command` per trick). One action, **yell
+  a trick**; triggers fire it. Three types: **command** (first word matched
+  case-insensitively, the rest is `{{message}}`), **redeem** (channel point
+  reward, created/edited from the app; its text box is `{{message}}`;
+  rewards made elsewhere can be bound but not edited; needs
+  affiliate/partner), **event** (follow, sub, resub, gifted subs, cheer with
+  bits at least / exactly).
+- **Triggers page:** the three types are one thing, so **one page, one
+  list** (nav item `bolt` "Triggers"; no separate Commands / Redeems /
+  Events pages, no tabs on the Twitch page).
+  - **List rows:** one line each: on/off toggle, type icon (`chat` /
+    `redeem` / `celebration`, same icons in the session log), the trigger,
+    and a short muted summary on the right ("viewer picks", or the one trick
+    with its combo). No description blob, **no Delete in the list**.
+  - **No starters / examples tab.** A fresh install has the defaults in the
+    list; Settings has **Reset to defaults** (Triggers, Settings).
+  - **Defaults:** `!doa` (viewer picks, Normal only) and `!kickflip` (one
+    trick: Kickflip). No bits, no events, no channel point rewards.
+  - **Edit card:** no subtitle lines; every row label left, control right,
+    same height and dividers. Rows: Type (Command / Redeem / Event, fields
+    follow it), Command, **Require bits** (toggle; on reveals **Bits
+    required**), Cooldown (seconds). Then **Yells**:
+    - **Trick:** **Viewer picks / Random / One trick** ("Named" and "Fixed"
+      read the same).
+    - **One trick** shows the chosen trick as a chip with its combo plus a
+      Change button (not a dropdown: the real trick list is far too long).
+      Hides Allowed tricks.
+    - **Allowed tricks:** **Categories / Allowlist / Denylist**. Categories =
+      kind chips (normal / double tap / triple tap / special / flips & rolls;
+      the kind list waits on discovery). Allowlist / Denylist = a list of
+      tricks used *instead of* the categories: a count ("3 tricks allowed" /
+      "N tricks blocked") and an Edit button. Rejected on the way: kinds plus
+      a separate "Never these" / "Blocked tricks" row (two controls for one
+      question), an "Advanced" link, and "Categories / Custom" (Custom read
+      like multiple rulesets).
+    - Kind chips are checkbox-style: same rounded corners as the segmented
+      control, on = check mark on soft gold, off = plain outlined name (no
+      strikethrough).
+    - Delete is a red button at the bottom of the edit card.
+  - **Trick picker** (not mocked yet): one type-to-search picker with combos
+    shown, used by One trick's Change and by the allow/deny list's Edit.
 - **What can be yelled, in layers:**
   1. **Possible:** what the skater can actually do (slotted tricks plus
      always-available ones). **No UI for managing it**: managing it by hand
      would be terrible. Ideally pulled from the game (not live; a save file
      or similar: needs discovery); failing that, a config file we read.
-  2. **Per trigger:** each command / redeem / event has a **denylist** on top
-     of that, by kind (**normal / double tap / triple tap / special**, plus
-     whatever kinds discovery turns up, e.g. flips/rolls) and by single
-     trick. So anyone can `!doa kickflip`, but specials or triple taps can be
-     kept behind a redeem.
-  - The Tricks page as an editor goes away (no per-trick commands, no
-    managing what's possible). Maybe a read-only view of what's possible;
-    undecided.
+  2. **Per trigger:** Allowed tricks above (categories, or an allowlist /
+     denylist instead), within what's possible. So anyone can
+     `!doa kickflip`, but specials or triple taps can be kept behind a
+     redeem.
+  - The Tricks page is gone (no per-trick commands, no managing what's
+    possible). Maybe a read-only view of what's possible later; undecided.
+- **Session log** command column shows what fired: `!doa indy`,
+  `!kickflip`, a reward's name or "Cheer 500" with its type icon.
+- **Twitch page** lost "Command prefix" (each command has its own trigger).
 - **Page subtitles:** none.
 - **Icons:** Material Symbols (Apache 2.0) everywhere; Twitch logo from Font
   Awesome Free brands (CC BY 4.0). Twitch's brand rules allow the logo only in
@@ -161,8 +190,9 @@ things moved off the Dashboard but hasn't been reviewed itself yet.
   hook); the counter and high count on the HUD; **overflow penalty None**
   (reset counter + clear stack, no bail). Settings travel in
   `doakickflip_inbox_settings` like `max_pending` does.
-- Twitch side: per-viewer cooldown, rate limit, command prefix, commands.
-  "Same trick twice" needs rewording or dropping.
+- Twitch side: per-viewer cooldown and rate limit (Settings' Stack rules
+  still has them; per-trigger cooldown now exists). "Same trick twice" needs
+  rewording or dropping.
 - Settings page still says "Bail after": rename to Stack limit.
 - Fake chat must be impossible to forget while live: a loud indicator when
   it's running (beyond its own card).
@@ -170,9 +200,10 @@ things moved off the Dashboard but hasn't been reviewed itself yet.
   fake chat text).
 - Discovery for the "possible" layer and trick kinds: see
   [todo.md](todo.md).
-- Mock up Commands / Redeems / Events (pages or tabs on Twitch; undecided)
-  with per-trigger denylists; drop the `!command` chips; decide what's left
-  of the Tricks page.
+- Triggers page leftovers: the **trick picker**; the Redeem and Event
+  states of the edit card; "+ add" / trick chips still use the old pill
+  shape; `!doa`'s default cooldown (10s in the mock) isn't decided; row
+  order in the list (grouped by type for now).
 - Review the **Twitch** and **Settings** pages.
 - Later: pick the real stack (not decided; avoid packaging that Defender
   likes to flag, e.g. PyInstaller-style bundles), then build it.
