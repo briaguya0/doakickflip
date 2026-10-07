@@ -23,8 +23,9 @@ http.server.ThreadingHTTPServer(("127.0.0.1", 8765), H).serve_forever()'
 
 Reviewed and settled so far: the **sidebar**, the **Dashboard** (Quick
 settings, Status, session log, testing tools) and the **Triggers** page's
-list and command editor. The Settings page got the things moved off the
-Dashboard (and a Reset to defaults card) but hasn't been reviewed itself yet.
+list and command editor, and the **Twitch** page. The Settings page got the
+things moved off the Dashboard (and a Reset to defaults card) but hasn't
+been reviewed itself yet.
 
 Screenshots without a person: headless Chromium (Flatpak) works, e.g.
 `flatpak run --filesystem=/tmp io.github.ungoogled_software.ungoogled_chromium
@@ -49,7 +50,7 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   out". The game's side talks about tricks that come up and that you nail /
   clear. "Inbox" stays an internal name only.
 - **Sidebar:** brand icon ("Skateboard" by Delapouite, CC BY 3.0, no
-  animation), plain divider, nav **Dashboard / Tricks / Twitch / Settings**.
+  animation), plain divider, nav **Dashboard / Triggers / Twitch / Settings**.
   No status section: the Twitch tab shows its connection state, Settings shows
   a red `error` marker when the game setup has a problem.
 - **Dashboard:** what people want to do from there: turn it on/off, tweak
@@ -155,7 +156,31 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
     possible). Maybe a read-only view of what's possible later; undecided.
 - **Session log** command column shows what fired: `!doa indy`,
   `!kickflip`, a reward's name or "Cheer 500" with its type icon.
-- **Twitch page** lost "Command prefix" (each command has its own trigger).
+- **Twitch page:** two ways in, **Read chat** (channel name only) and **Log
+  in with Twitch**, as two cards that stay on screen. It must be extremely
+  clear which way you're connected.
+  - Each card lists what works with it (ticks / crosses): Read chat =
+    **Messages, Cheers** (no channel point redeems, no events); logging in =
+    all four. Twitch terms: you **cheer**, paid in **bits** ("Bits on
+    commands" was our jargon). What anonymous chat reading really gives
+    (cheers, sub notices) still needs checking against Twitch's docs.
+  - No subtitles on the cards; the button names the action ("Read chat",
+    "Log in with Twitch"; never a vague "Connect").
+  - **In use:** the card is outlined gold and its heading *becomes* the
+    status, with the action at the right: "Reading <channel>'s chat"
+    (`visibility`) + **Stop**; "Logged in as <channel>" (`verified_user`) +
+    **Log out**. No separate status line. Channel names link to the Twitch
+    channel (no IRC-style `#channel`; streamers don't think in IRC).
+  - **Reading → logged in** is one click: the login card keeps its button
+    while reading; logging in replaces reading (no Stop first).
+  - **Logged in** shows only the login card (it covers reading; a faded Read
+    chat card looked clickable).
+  - Triggers that can't fire with the current connection (redeems / events
+    while only reading chat) are marked **on the Triggers page only**, per
+    row: toggle disabled and shown off (the trigger keeps its own on/off for
+    later), name and icon dimmed, summary replaced by lock + **Needs
+    login**. No banner on either page.
+  - "Command prefix" is gone (each command has its own trigger).
 - **Page subtitles:** none.
 - **Icons:** Material Symbols (Apache 2.0) everywhere; Twitch logo from Font
   Awesome Free brands (CC BY 4.0). Twitch's brand rules allow the logo only in
@@ -204,6 +229,11 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   states of the edit card; "+ add" / trick chips still use the old pill
   shape; `!doa`'s default cooldown (10s in the mock) isn't decided; row
   order in the list (grouped by type for now).
-- Review the **Twitch** and **Settings** pages.
+- Review the **Settings** page.
+- Naming of the chat trigger type: proposed **Chat** (type) / **Starts with**
+  (field) / **Require a cheer** + **Bits** (amount) instead of Command /
+  Command / Require bits + Bits required. Not decided.
+- Dashboard Status row and the sidebar's Twitch marker: say which way you're
+  connected (reading chat vs logged in)? Not decided.
 - Later: pick the real stack (not decided; avoid packaging that Defender
   likes to flag, e.g. PyInstaller-style bundles), then build it.

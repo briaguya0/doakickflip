@@ -69,6 +69,17 @@
                 <span class="summary"><span class="glyphs small"><span class="icon arrow" aria-label="west">west</span><span class="plus">+</span><img class="face-glyph" src="glyphs/xbox_x_blue.svg" alt="X"></span>Kickflip</span>
               </a>
             </li>
+            <!-- not a default: a user-added reward, here to show a trigger that can't fire with the current
+                 connection (reading chat only). Its toggle is disabled and shown off; it keeps its own on/off
+                 and goes back to it once logged in. -->
+            <li class="row-unavailable">
+              <label class="toggle" title="Log in with Twitch to use this"><input type="checkbox" disabled><i></i></label>
+              <span class="icon trigger-type" title="Channel point reward">redeem</span>
+              <a class="trigger-item" href="#">
+                <strong>Special trick</strong>
+                <span class="summary needs-login"><span class="icon">lock</span>Needs login</span>
+              </a>
+            </li>
           </ul>
         </div>
 

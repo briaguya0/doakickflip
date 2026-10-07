@@ -1790,3 +1790,183 @@ a.link:hover {
   color: var(--gold);
   font-size: 1.15rem;
 }
+
+/* ── Twitch page: two ways to connect ──────────────────────────────── */
+.connect-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.9rem;
+}
+
+.connect-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+}
+
+.connect-option .muted {
+  margin: 0;
+}
+
+.connect-option > :last-child {
+  margin-top: auto;
+}
+
+.connect-option > button {
+  align-self: flex-start;
+}
+
+.connect-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.connect-head .icon {
+  color: var(--gold);
+}
+
+.can-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.can-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.can-list .icon {
+  font-size: 1rem;
+}
+
+.can-list .yes .icon { color: var(--tip); }
+.can-list .no { color: var(--text-muted); }
+.can-list .no .icon { color: var(--text-muted); }
+
+.proto-label {
+  margin: 2rem 0 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-top: 1px dashed var(--border-strong);
+  padding-top: 0.75rem;
+}
+
+.connected {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.connected .state-icon {
+  font-size: 1.6rem;
+}
+
+.connected-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.connected-text strong {
+  font-size: 1.05rem;
+}
+
+.connected-text span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.connected-text b {
+  color: var(--text);
+}
+
+.connected + .banner {
+  margin: 1rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* trigger that can't fire with the current Twitch connection (redeem / event while only reading chat):
+   toggle disabled, name and type dimmed, the summary says why */
+.trigger-list li.row-unavailable .trigger-type,
+.trigger-list li.row-unavailable .trigger-item strong {
+  opacity: 0.45;
+}
+
+.toggle:has(input:disabled) {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.trigger-item .summary.needs-login {
+  gap: 0.3rem;
+  color: var(--alert-warning);
+  font-weight: 600;
+}
+
+.trigger-item .summary.needs-login .icon {
+  font-size: 1rem;
+}
+
+.proto-label.first {
+  margin-top: 0;
+  border-top: none;
+  padding-top: 0;
+}
+
+.connect-option.active {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+
+
+.connect-option .covered {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.connect-option .covered .icon {
+  font-size: 1rem;
+  color: var(--tip);
+}
+
+.connect-option .connected-text strong {
+  font-size: 0.95rem;
+}
+
+.connect-option .connected .state-icon {
+  font-size: 1.3rem;
+}
+
+/* in use: the heading is the status, with its Stop / Log out at the right */
+.connect-option.active .connect-head .btn-sm {
+  margin-left: auto;
+}
+
+.connect-option.active .connect-head .state-icon {
+  font-size: 1.3rem;
+  color: var(--tip);
+}
+
+.connect-option.active > :last-child {
+  margin-top: 0;
+}

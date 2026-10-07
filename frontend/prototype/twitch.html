@@ -46,16 +46,76 @@
     <div class="page">
       <h1>Twitch</h1>
 
+      <!-- The two ways in stay on screen in every state, each with what works with it. The one in use is
+           outlined and shows its status; logging in while reading chat just replaces reading (no need to
+           stop first). Logged in covers everything reading does, so it shows only its own card. -->
+      <div class="proto-label first">Prototype only: not connected</div>
       <div class="card">
-        <h2><span class="brand-icon twitch"><i class="fa-brands fa-twitch" aria-hidden="true"></i></span>Twitch</h2>
-        <p class="status-line"><span class="icon state-icon off">power_off</span>Not connected</p>
-        <p class="muted small">Reading chat doesn't need your password or any permissions: just the channel name. Log in only if you want channel point redeems.</p>
-        <label class="field">Channel
-          <div class="input-row">
-            <input type="text" placeholder="yourchannel">
-            <button class="btn-twitch"><i class="fa-brands fa-twitch" aria-hidden="true"></i> Connect</button>
+        <div class="connect-options">
+          <div class="connect-option">
+            <div class="connect-head"><span class="icon">visibility</span><strong>Read chat</strong></div>
+            <ul class="can-list">
+              <li class="yes"><span class="icon">check</span>Messages</li>
+              <li class="yes"><span class="icon">check</span>Cheers</li>
+              <li class="no"><span class="icon">close</span>Channel point redeems</li>
+              <li class="no"><span class="icon">close</span>Events</li>
+            </ul>
+            <div class="input-row">
+              <input type="text" placeholder="yourchannel">
+              <button>Read chat</button>
+            </div>
           </div>
-        </label>
+          <div class="connect-option">
+            <div class="connect-head"><span class="icon">login</span><strong>Log in with Twitch</strong></div>
+            <ul class="can-list">
+              <li class="yes"><span class="icon">check</span>Messages</li>
+              <li class="yes"><span class="icon">check</span>Cheers</li>
+              <li class="yes"><span class="icon">check</span>Channel point redeems</li>
+              <li class="yes"><span class="icon">check</span>Events</li>
+            </ul>
+            <button class="btn-twitch"><i class="fa-brands fa-twitch" aria-hidden="true"></i> Log in with Twitch</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="proto-label">Prototype only: reading chat</div>
+      <div class="card">
+        <div class="connect-options">
+          <div class="connect-option active">
+            <div class="connect-head"><span class="icon state-icon ok">visibility</span><strong>Reading <a class="link" href="https://www.twitch.tv/briaguya" target="_blank" rel="noopener">briaguya</a>'s chat</strong><button class="btn-ghost btn-sm">Stop</button></div>
+            <ul class="can-list">
+              <li class="yes"><span class="icon">check</span>Messages</li>
+              <li class="yes"><span class="icon">check</span>Cheers</li>
+              <li class="no"><span class="icon">close</span>Channel point redeems</li>
+              <li class="no"><span class="icon">close</span>Events</li>
+            </ul>
+          </div>
+          <div class="connect-option">
+            <div class="connect-head"><span class="icon">login</span><strong>Log in with Twitch</strong></div>
+            <ul class="can-list">
+              <li class="yes"><span class="icon">check</span>Messages</li>
+              <li class="yes"><span class="icon">check</span>Cheers</li>
+              <li class="yes"><span class="icon">check</span>Channel point redeems</li>
+              <li class="yes"><span class="icon">check</span>Events</li>
+            </ul>
+            <button class="btn-twitch"><i class="fa-brands fa-twitch" aria-hidden="true"></i> Log in with Twitch</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="proto-label">Prototype only: logged in</div>
+      <div class="card">
+        <div class="connect-options">
+          <div class="connect-option active">
+            <div class="connect-head"><span class="icon state-icon ok">verified_user</span><strong>Logged in as <a class="link" href="https://www.twitch.tv/briaguya" target="_blank" rel="noopener">briaguya</a></strong><button class="btn-ghost btn-sm">Log out</button></div>
+            <ul class="can-list">
+              <li class="yes"><span class="icon">check</span>Messages</li>
+              <li class="yes"><span class="icon">check</span>Cheers</li>
+              <li class="yes"><span class="icon">check</span>Channel point redeems</li>
+              <li class="yes"><span class="icon">check</span>Events</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </main>
