@@ -32,8 +32,8 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   - Query wraps the IPC calls to main: e.g. reading settings and saving
     them (mutation), mod status and Install / Uninstall, the trigger list,
     the session log, Twitch connection state. Pushes from main (a new yell
-    in the log, Twitch dropping) update the cache. Exactly where it earns
-    its keep will show once we build.
+    in the log, Twitch dropping) update the cache. We'll see where it's most
+    useful once we start building.
   - TanStack Form maybe later for the trigger editor.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
