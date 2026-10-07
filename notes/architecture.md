@@ -14,6 +14,16 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   decompile/patch/compile), writing the inbox, trigger matching, Twitch.
   Needs ports of `tools/prx.py`, the `qbdec` + `qbc` path `build_mod.py`
   uses, and the inbox writer in `call_trick.py`.
+- **Electron Forge 8 with the Vite + TypeScript template** (Forge's Vite
+  plugin), over electron-vite.
+  - Forge: official Electron project, released 2026-09 (8.0.1), Vite 8,
+    covers dev, packaging, installers ("makers") and publishing. Its Vite
+    plugin is still labelled experimental (breaking changes possible in
+    minors): pin exact versions. Needs Node 22.12+, ESM-only.
+  - electron-vite: nicer dev loop (main/preload hot reload, one config, V8
+    bytecode option) but only builds; packaging needs electron-builder too.
+    Last stable 5.0.0 (2025-12), 6.0 in beta.
+  - Switching later is mostly build config, not app code.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -31,15 +41,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Proposed (not confirmed yet)
 
-- **Electron Forge 8 + its Vite plugin** over electron-vite.
-  - Forge: official Electron project, released 2026-09 (8.0.1), Vite 8,
-    covers dev, packaging, installers ("makers") and publishing. Its Vite
-    plugin is still labelled experimental (breaking changes possible in
-    minors): pin exact versions. Needs Node 22.12+, ESM-only.
-  - electron-vite: nicer dev loop (main/preload hot reload, one config, V8
-    bytecode option) but only builds; packaging needs electron-builder too.
-    Last stable 5.0.0 (2025-12), 6.0 in beta.
-  - Switching later is mostly build config, not app code.
 - **TanStack Router + TanStack Query, client-only; not TanStack Start.**
   Start's SPA mode still assumes its own server for server functions /
   routes; in Electron the main process (over IPC) is the backend already.
