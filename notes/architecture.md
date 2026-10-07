@@ -78,7 +78,8 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   code + "Open twitch.tv/activate" and waits. Access tokens last 4h; refresh
   tokens are one-time use and expire after 30 days unused, so save every
   refresh; store tokens with Electron `safeStorage`. Ask for all scopes up
-  front (redeems read + manage, bits, subs, followers). Rejected: implicit
+  front (redeems read + manage, bits, subs, followers). Why not the others
+  (my reasoning, not discussed yet): implicit
   flow with a localhost redirect server (Sail; no refresh), authorization
   code (needs a secret), a Twitch login page inside our own window.
 - **Chat in logged-in mode:** IRC in both modes (one code path) or EventSub
