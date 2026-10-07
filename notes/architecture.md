@@ -42,6 +42,19 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 - **Python tools stay** as discovery tools and as the reference for the TS
   port: local-only parity tests that the TS output is byte-identical to the
   Python output (like `tools/roundtrip.py`).
+- **Twitch: Twurple** (`@twurple/chat`, `auth`, `eventsub-ws`, `api`;
+  8.2.0, 2026-09). The only maintained library covering all of it: chat
+  with or without login, EventSub (redeems, follows, subs, cheers), the
+  Helix API (creating/editing rewards), auth incl. Device Code Flow, native
+  TS. Passed on:
+  - `tmi.js` (chat/IRC only, no channel points; last release 2021),
+    `@tmi.js/chat` (chat only, 0.x).
+  - comfy.js: chat via tmi.js v1 plus its own EventSub client and reward
+    API calls, but no token handling at all (README points at third-party
+    token generator sites); plain JS, hobby-bot oriented.
+  - twitch-js, twitch-chat-client: dead. Rolling our own (Sail's way):
+    we'd own reconnects, keepalives, rate limits, token refresh.
+  - We still need our own Twitch application (client ID), like Sail.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -59,16 +72,18 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Open
 
-- **Twitch library and login flow:** still being discussed. Looked at so
-  far (nothing chosen):
-  - Twurple (`@twurple/*` 8.2.0, 2026-09): chat without login when no auth
-    provider is given; `RefreshingAuthProvider` supports Twitch's Device
-    Code Flow (public client, no secret, no redirect server); EventSub over
-    WebSocket; Helix API for rewards. DCF refresh tokens are one-time use
-    and expire after 30 days unused.
-  - `tmi.js` (last release 2021), `@tmi.js/chat` (0.x),
-    `@twurple/auth-electron` (last release 2023).
-  - Either way we need our own Twitch application (client ID), like Sail.
+- **Twitch login / auth with Twurple:** how exactly (next discussion).
+  Leaning: Twitch's **Device Code Flow** (Twitch lists it for Electron apps;
+  public client, no secret, no redirect server): the login card shows a
+  code + "Open twitch.tv/activate" and waits. Access tokens last 4h; refresh
+  tokens are one-time use and expire after 30 days unused, so save every
+  refresh; store tokens with Electron `safeStorage`. Ask for all scopes up
+  front (redeems read + manage, bits, subs, followers). Rejected: implicit
+  flow with a localhost redirect server (Sail; no refresh), authorization
+  code (needs a secret), a Twitch login page inside our own window.
+- **Chat in logged-in mode:** IRC in both modes (one code path) or EventSub
+  `channel.chat.message` once logged in (Twitch's recommendation; needs a
+  user token, so Read chat stays IRC either way). Leaning IRC for both.
 - **Test fixtures for mod install.** Nothing from THUG2 or THUG Pro can be
   committed. Idea: a hand-written fake pause-menu script with the same shape
   as the hook point (`if GameModeEquals is_singlesession` … `endif`),
