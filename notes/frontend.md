@@ -241,6 +241,9 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   states of the edit card; "+ add" / trick chips still use the old pill
   shape; `!doa`'s default cooldown (10s in the mock) isn't decided; row
   order in the list (grouped by type for now).
+- Twitch page states still to mock: **waiting for approval** (the device
+  code, Open twitch.tv/activate, an expired code), **Connecting…**, and
+  **login expired** (see [architecture.md](architecture.md)).
 - Finish reviewing **Settings** (Stack rules naming/placement, Testing, Button prompts, Reset, Credits).
 - Naming of the chat trigger type: proposed **Chat** (type) / **Starts with**
   (field) / **Require a cheer** + **Bits** (amount) instead of Command /

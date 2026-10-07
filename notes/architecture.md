@@ -55,6 +55,50 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   - twitch-js, twitch-chat-client: dead. Rolling our own (Sail's way):
     we'd own reconnects, keepalives, rate limits, token refresh.
   - We still need our own Twitch application (client ID), like Sail.
+- **Twitch connections:**
+  - **Read chat:** Twurple `ChatClient` (IRC underneath) with no auth
+    provider. Messages and cheers both come through chat.
+  - **Logged in:** **EventSub only** (`@twurple/eventsub-ws`), one WebSocket
+    for chat (`channel.chat.message`, needs `user:read:chat`), cheers, subs,
+    follows and redeems. No IRC. Logging in while reading stops the IRC
+    client and starts EventSub.
+  - Twurple doesn't hide the difference (two APIs, `ChatMessage` vs
+    `EventSubChannelChatMessageEvent`), so we have our own small "chat
+    source" layer turning both into one shape (user, display name, colour,
+    badges, text, bits). Trigger matching never knows which it came from.
+- **Twitch login: Device Code Flow with `RefreshingAuthProvider`**, all in
+  the main process.
+  - Provider created with just our client ID (public client: no secret,
+    refreshing included).
+  - Login: `startDeviceCodeFlow(scopes)` → show `userCode` + open
+    `verificationUri`; **we** poll `addUserForDeviceCode` every `interval`
+    s until approved / expired (Twurple doesn't poll: handle
+    `authorization_pending`, `slow_down`, expiry). All scopes up front
+    (redeems read + manage, bits, subs, followers, `user:read:chat`).
+  - Tokens: access token ~4h; refresh token one-time use, expires after 30
+    days unused. The provider refreshes **on demand** when a client asks for
+    a token (treats it as expired 1 min early), fires `onRefresh` → we save
+    the new pair **immediately** (encrypted, Electron `safeStorage`); fires
+    `onRefreshFailure` and stops retrying that user → we show the login card
+    again. Missing scopes throw (a refresh can't add scopes; needs a new
+    login). Startup: `addUser(savedUserId, savedToken)`. Log out:
+    `removeUser` + `revokeToken` + delete what we saved.
+  - Why this flow: Twitch lists Device Code Flow for Electron apps. Implicit
+    flow needs a localhost redirect server and gives no refresh (Sail's
+    "log out and back in" for new scopes); authorization code needs a
+    secret; a Twitch login page in our own window asks for passwords in our
+    app.
+  - **What the user sees:**
+    - First time: two cards. Read chat connects at once (channel saved).
+      Log in shows "waiting for approval" with the code and an Open
+      twitch.tv/activate button, then "Logged in as …"; an expired code goes
+      back to the button.
+    - Opened again within 4h, or within 30 days: reconnects the way it was
+      left, no clicks (a quiet refresh after 4h; each refresh restarts the
+      30 days). Read chat never expires.
+    - After 30 days unused (logged in): the refresh fails; the Twitch page
+      says the login expired and shows the two options; triggers that need
+      a login show "Needs login".
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -72,19 +116,10 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Open
 
-- **Twitch login / auth with Twurple:** how exactly (next discussion).
-  Leaning: Twitch's **Device Code Flow** (Twitch lists it for Electron apps;
-  public client, no secret, no redirect server): the login card shows a
-  code + "Open twitch.tv/activate" and waits. Access tokens last 4h; refresh
-  tokens are one-time use and expire after 30 days unused, so save every
-  refresh; store tokens with Electron `safeStorage`. Ask for all scopes up
-  front (redeems read + manage, bits, subs, followers). Why not the others
-  (my reasoning, not discussed yet): implicit
-  flow with a localhost redirect server (Sail; no refresh), authorization
-  code (needs a secret), a Twitch login page inside our own window.
-- **Chat in logged-in mode:** IRC in both modes (one code path) or EventSub
-  `channel.chat.message` once logged in (Twitch's recommendation; needs a
-  user token, so Read chat stays IRC either way). Leaning IRC for both.
+- **After a login expires (30 days):** fall back to reading the same
+  channel's chat so plain chat triggers keep working until you log in again?
+- **Reconnect on launch:** a setting, on by default? (Some streamers may not
+  want the app talking to Twitch the moment it opens.)
 - **Test fixtures for mod install.** Nothing from THUG2 or THUG Pro can be
   committed. Idea: a hand-written fake pause-menu script with the same shape
   as the hook point (`if GameModeEquals is_singlesession` … `endif`),
