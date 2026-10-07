@@ -24,6 +24,17 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
     bytecode option) but only builds; packaging needs electron-builder too.
     Last stable 5.0.0 (2025-12), 6.0 in beta.
   - Switching later is mostly build config, not app code.
+- **TanStack Router + TanStack Query, client-only; not TanStack Start.**
+  Start's SPA mode still assumes its own server for server functions /
+  routes; in Electron the main process (over IPC) is the backend already.
+  - Router with its Vite plugin (file-based, typed); hash or memory history
+    in the packaged app (`file://` has no real history).
+  - Query wraps the IPC calls to main: e.g. reading settings and saving
+    them (mutation), mod status and Install / Uninstall, the trigger list,
+    the session log, Twitch connection state. Pushes from main (a new yell
+    in the log, Twitch dropping) update the cache. Exactly where it earns
+    its keep will show once we build.
+  - TanStack Form maybe later for the trigger editor.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -41,14 +52,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Proposed (not confirmed yet)
 
-- **TanStack Router + TanStack Query, client-only; not TanStack Start.**
-  Start's SPA mode still assumes its own server for server functions /
-  routes; in Electron the main process (over IPC) is the backend already.
-  - Router with its Vite plugin (file-based, typed); hash or memory history
-    in the packaged app (`file://` has no real history).
-  - Query wraps every IPC call (settings, mod status, session log, Twitch
-    state); pushes from main (a new yell, a disconnect) update the cache.
-  - TanStack Form maybe later for the trigger editor.
 - **Process layout:** main (Node: files, mod, inbox, Twitch, stored
   settings/tokens) ↔ preload (small typed `window.api` via
   `contextBridge`) ↔ renderer (React, no Node). `contextIsolation` on,
