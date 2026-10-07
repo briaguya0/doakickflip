@@ -181,6 +181,18 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
     later), name and icon dimmed, summary replaced by lock + **Needs
     login**. No banner on either page.
   - "Command prefix" is gone (each command has its own trigger).
+- **Settings page** (partly reviewed):
+  - No subtitles on rows or fields (credits text stays). Reset to defaults
+    should confirm instead of explaining.
+  - **Game:** THUG Pro folder only; no Inbox field (meaningless to users,
+    derived from the folder; if it can't be written, Status says so in plain
+    words). **Mod** is one row with two states: **Installed** + **Uninstall
+    mod**, or **Not installed** + **Install mod**. A broken install counts as
+    not installed. No "Rebuild & install" (users don't need "rebuild") and no
+    reinstall (no clear reason); maybe **Update mod** later when the app
+    carries a newer mod. "Restore original" was unclear ("original" what?).
+  - **Same trick twice** is gone: yelling a trick already on the stack is
+    always fine (one viewer shouldn't block another).
 - **Page subtitles:** none.
 - **Icons:** Material Symbols (Apache 2.0) everywhere; Twitch logo from Font
   Awesome Free brands (CC BY 4.0). Twitch's brand rules allow the logo only in
@@ -216,8 +228,8 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   (reset counter + clear stack, no bail). Settings travel in
   `doakickflip_inbox_settings` like `max_pending` does.
 - Twitch side: per-viewer cooldown and rate limit (Settings' Stack rules
-  still has them; per-trigger cooldown now exists). "Same trick twice" needs
-  rewording or dropping.
+  still has them; per-trigger cooldown now exists): move them, or a Chat
+  heading.
 - Settings page still says "Bail after": rename to Stack limit.
 - Fake chat must be impossible to forget while live: a loud indicator when
   it's running (beyond its own card).
@@ -229,7 +241,7 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   states of the edit card; "+ add" / trick chips still use the old pill
   shape; `!doa`'s default cooldown (10s in the mock) isn't decided; row
   order in the list (grouped by type for now).
-- Review the **Settings** page.
+- Finish reviewing **Settings** (Stack rules naming/placement, Testing, Button prompts, Reset, Credits).
 - Naming of the chat trigger type: proposed **Chat** (type) / **Starts with**
   (field) / **Require a cheer** + **Bits** (amount) instead of Command /
   Command / Require bits + Bits required. Not decided.

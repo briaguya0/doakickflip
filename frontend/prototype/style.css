@@ -1970,3 +1970,7 @@ a.link:hover {
 .connect-option.active > :last-child {
   margin-top: 0;
 }
+
+.setting-row .status-line {
+  margin: 0;
+}

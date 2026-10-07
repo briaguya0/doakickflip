@@ -48,6 +48,13 @@ layered allowlist in [frontend.md](frontend.md)).
   the game could still drop impossible yells itself; the app-side list is
   so the app knows before sending (and could tell chat).
 
+**Bug: build_mod.py after a THUG Pro update.** The build reads the original
+archive from `thugpro_qb.prx.bak` whenever that exists. A THUG Pro update
+overwrites `thugpro_qb.prx` but leaves our old `.bak`, so the next build
+would patch the *old* scripts and install them over the update. Fix: notice
+when the live file isn't the one we installed (e.g. keep a hash of what we
+wrote) and treat it as the new original (refresh the backup from it).
+
 Later:
 - Twitch bridge: a separate program that writes the inbox from Twitch chat
   (anonymous IRC read is enough), with name aliases and flood control
