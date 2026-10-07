@@ -1,7 +1,7 @@
 # App architecture
 
 How the real app (replacing the static prototype in `frontend/prototype/`)
-gets built. Decided things first, then what's proposed and what's still open.
+gets built. Decided things first, then what's still open.
 Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 (Wails, Go, hand-rolled Twitch client), reusing existing libraries.
 
@@ -35,6 +35,13 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
     in the log, Twitch dropping) update the cache. We'll see where it's most
     useful once we start building.
   - TanStack Form maybe later for the trigger editor.
+- **Process layout:** main (Node: files, mod, inbox, Twitch, stored
+  settings/tokens) ↔ preload (small typed `window.api` via
+  `contextBridge`) ↔ renderer (React, no Node). `contextIsolation` on,
+  `nodeIntegration` off.
+- **Python tools stay** as discovery tools and as the reference for the TS
+  port: local-only parity tests that the TS output is byte-identical to the
+  Python output (like `tools/roundtrip.py`).
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -49,16 +56,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   - The inbox writer: format, `seq`, trimming (keep 32), atomic writes,
     settings block; read back with our own decoder.
   - Trigger matching (`!doa nose manual`, allowed tricks).
-
-## Proposed (not confirmed yet)
-
-- **Process layout:** main (Node: files, mod, inbox, Twitch, stored
-  settings/tokens) ↔ preload (small typed `window.api` via
-  `contextBridge`) ↔ renderer (React, no Node). `contextIsolation` on,
-  `nodeIntegration` off.
-- **Python tools stay** as discovery tools and as the reference for the TS
-  port: local-only parity tests that the TS output is byte-identical to the
-  Python output (like `tools/roundtrip.py`).
 
 ## Open
 
