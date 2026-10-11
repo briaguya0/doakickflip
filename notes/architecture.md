@@ -99,6 +99,14 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
     - After 30 days unused (logged in): the refresh fails; the Twitch page
       says the login expired and shows the two options; triggers that need
       a login show "Needs login".
+- **UI components: shadcn/ui on Base UI, with Tailwind CSS v4.** shadcn
+  copies component source into the repo (we own and restyle it) rather than
+  being a dependency; it can sit on Base UI, React Aria or Radix, and Base UI
+  became its default in 2026-07. Our prototype tokens (asphalt, THUG gold,
+  GitHub alert colours) become its CSS variables. Rough mapping: segmented
+  controls → Toggle Group, toggles → Switch, sliders → Slider, kind chips →
+  Toggle, edit card → Card, toasts → Sonner, and the trick picker → Command
+  (cmdk) in a Popover/Dialog.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -116,6 +124,23 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Open
 
+- **Rest of the frontend stack** (proposed, not decided):
+  - Icons: keep Material Symbols (shadcn defaults to Lucide). Either way,
+    **bundle fonts/icons locally**: the prototype loads Material Symbols from
+    Google Fonts and Font Awesome from a CDN; the app shouldn't need the
+    internet to draw its UI.
+  - **zod**: check settings/trigger files on load, and validate everything
+    arriving from the renderer over IPC in main (renderer is untrusted).
+  - Forms: TanStack Form (matches the stack, takes zod schemas) or
+    react-hook-form (shadcn's older examples).
+  - Typed IPC: our own small shared contract (call names + zod schemas)
+    rather than `electron-trpc` (last release 2024).
+  - Stored settings: our own JSON files in Electron's userData folder, zod +
+    atomic writes, rather than `electron-store`.
+  - Lint/format: Biome or ESLint + Prettier (Forge's template sets up
+    ESLint).
+  - Package manager: npm or pnpm (pnpm + Forge needs
+    `node-linker=hoisted`).
 - **After a login expires (30 days):** fall back to reading the same
   channel's chat so plain chat triggers keep working until you log in again?
 - **Reconnect on launch:** a setting, on by default? (Some streamers may not
