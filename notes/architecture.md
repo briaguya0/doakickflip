@@ -107,6 +107,14 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   controls → Toggle Group, toggles → Switch, sliders → Slider, kind chips →
   Toggle, edit card → Card, toasts → Sonner, and the trick picker → Command
   (cmdk) in a Popover/Dialog.
+- **Icons: Material Symbols from npm** (`material-symbols`, Apache 2.0,
+  0.48.0, 2026-10), bundled with the app, so nothing hits Google Fonts (the
+  prototype loads it from there). shadcn's default Lucide not used. Check
+  the package's variable font keeps the axes the prototype uses (FILL, wght
+  100–700, GRAD −50–200); `@fontsource-variable/material-symbols-outlined`
+  is the fallback. The Twitch logo is one icon: take it as an SVG from
+  `@fortawesome/free-brands-svg-icons` (CC BY 4.0) instead of loading Font
+  Awesome's CSS from a CDN.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -125,10 +133,7 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 ## Open
 
 - **Rest of the frontend stack** (proposed, not decided):
-  - Icons: keep Material Symbols (shadcn defaults to Lucide). Either way,
-    **bundle fonts/icons locally**: the prototype loads Material Symbols from
-    Google Fonts and Font Awesome from a CDN; the app shouldn't need the
-    internet to draw its UI.
+
   - **zod**: check settings/trigger files on load, and validate everything
     arriving from the renderer over IPC in main (renderer is untrusted).
   - Forms: TanStack Form (matches the stack, takes zod schemas) or
