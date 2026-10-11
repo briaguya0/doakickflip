@@ -58,10 +58,12 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   - Top row, two cards side by side:
     - **Quick settings** (wide). A title plus plain setting rows: a toggle as
       the card title read badly ("Taking yells"), and so did no title. Just
-      three rows: **Enabled** (toggle), **Trick clears** (Immediate /
-      Landed), **Stack overflow penalty** (Bail / None). Two-way choices use
-      a segmented control. Stack limit moved to Settings; per-viewer cooldown
-      and "same trick twice" left the Dashboard (Twitch side / Settings).
+      four rows: **Enabled** (toggle), **Trick clears** (Immediate /
+      Landed), **Stack limit** (number, default 8; one more is an overflow,
+      the list turns red at 75%), **Stack overflow penalty** (Bail / None).
+      Two-way choices use a segmented control. Stack limit went to Settings
+      for a while ("Bail after") and came back: named so it isn't tied to
+      bailing (also considered: Stack max, Stack size, Max tricks).
     - **Status** (thin, 240px): **THUG Pro version** (not found / untested
       version / ok), **Mod installed**, **Yells → Game**, **Twitch**. Checks
       are ok / warning / problem / skipped (`check_circle`, `warning`,
@@ -123,7 +125,8 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   - **Edit card:** no subtitle lines; every row label left, control right,
     same height and dividers. Rows: Type (Command / Redeem / Event, fields
     follow it), Command, **Require bits** (toggle; on reveals **Bits
-    required**), Cooldown (seconds). Then **Yells**:
+    required**), **Cooldown (global)** and **Cooldown (per user)** (seconds,
+    "s" inside the box; per user blank = none). Then **Yells**:
     - **Trick:** **Viewer picks / Random / One trick** ("Named" and "Fixed"
       read the same).
     - **One trick** shows the chosen trick as a chip with its combo plus a
@@ -193,6 +196,12 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
     carries a newer mod. "Restore original" was unclear ("original" what?).
   - **Same trick twice** is gone: yelling a trick already on the stack is
     always fine (one viewer shouldn't block another).
+  - **Stack rules card is gone.** Stack limit moved to the Dashboard's Quick
+    settings. Per-viewer cooldown became a per-trigger **Cooldown (per
+    user)** (Sail only has a per-trigger cooldown; per user is ours).
+    **Max requests per minute** was dropped: per-trigger cooldowns and the
+    stack limit already cover a flood, and silently dropped yells are unfair
+    while nothing goes back to chat.
 - **Page subtitles:** none.
 - **Icons:** Material Symbols (Apache 2.0) everywhere; Twitch logo from Font
   Awesome Free brands (CC BY 4.0). Twitch's brand rules allow the logo only in
@@ -227,10 +236,6 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   hook); the counter and high count on the HUD; **overflow penalty None**
   (reset counter + clear stack, no bail). Settings travel in
   `doakickflip_inbox_settings` like `max_pending` does.
-- Twitch side: per-viewer cooldown and rate limit (Settings' Stack rules
-  still has them; per-trigger cooldown now exists): move them, or a Chat
-  heading.
-- Settings page still says "Bail after": rename to Stack limit.
 - Fake chat must be impossible to forget while live: a loud indicator when
   it's running (beyond its own card).
 - Terminology pass: "yell" everywhere user-facing (Settings' "Inbox" field,
@@ -244,7 +249,7 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
 - Twitch page states still to mock: **waiting for approval** (the device
   code, Open twitch.tv/activate, an expired code), **Connecting…**, and
   **login expired** (see [architecture.md](architecture.md)).
-- Finish reviewing **Settings** (Stack rules naming/placement, Testing, Button prompts, Reset, Credits).
+- Finish reviewing **Settings** (Testing, Button prompts, Reset, Credits).
 - Naming of the chat trigger type: proposed **Chat** (type) / **Starts with**
   (field) / **Require a cheer** + **Bits** (amount) instead of Command /
   Command / Require bits + Bits required. Not decided.

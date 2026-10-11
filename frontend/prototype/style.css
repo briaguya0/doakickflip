@@ -1974,3 +1974,27 @@ a.link:hover {
 .setting-row .status-line {
   margin: 0;
 }
+
+/* number input with its unit inside the box, right-aligned */
+.suffix-input {
+  position: relative;
+  display: inline-block;
+}
+
+.setting-row .suffix-input input[type="number"] {
+  padding-right: 1.6rem;
+}
+
+.suffix-input > span {
+  position: absolute;
+  right: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.control .setting-row input[type="number"] {
+  width: 5.5rem;
+}

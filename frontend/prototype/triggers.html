@@ -106,9 +106,14 @@
             <div class="text"><strong>Bits required</strong></div>
             <input type="number" value="100">
           </div>
+          <!-- cooldowns in seconds; per user blank = none -->
           <div class="setting-row">
-            <div class="text"><strong>Cooldown (seconds)</strong></div>
-            <input type="number" value="10">
+            <div class="text"><strong>Cooldown (global)</strong></div>
+            <span class="suffix-input"><input type="number" value="10"><span>s</span></span>
+          </div>
+          <div class="setting-row">
+            <div class="text"><strong>Cooldown (per user)</strong></div>
+            <span class="suffix-input"><input type="number" placeholder="—"><span>s</span></span>
           </div>
 
           <div class="section-label">Yells</div>

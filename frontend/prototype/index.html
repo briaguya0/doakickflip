@@ -60,6 +60,11 @@
               <label><input type="radio" name="clears"><span>Landed</span></label>
             </div>
           </div>
+          <!-- tricks allowed on the stack; one more is an overflow. The list turns red at 75% of it. -->
+          <div class="setting-row">
+            <div class="text"><strong>Stack limit</strong></div>
+            <input type="number" min="1" max="30" value="8">
+          </div>
           <div class="setting-row">
             <div class="text"><strong>Stack overflow penalty</strong></div>
             <div class="segmented">
