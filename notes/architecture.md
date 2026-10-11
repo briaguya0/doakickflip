@@ -38,6 +38,50 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   settings/tokens) ↔ preload (small typed `window.api` via
   `contextBridge`) ↔ renderer (React, no Node). `contextIsolation` on,
   `nodeIntegration` off.
+- **IPC: Electron's recommended pattern + our own thin typed layer, no
+  library.**
+  - The problem: the renderer (Chromium page, no file/system access) and
+    main (Node, full access) are separate processes that can only exchange
+    messages (a name + data). Nearly every real action crosses that gap
+    (Install mod, Save trigger, Read chat, Send a trick → inbox; and back:
+    a yell arrived, Twitch dropped). Two risks: **silent mismatches** (TS
+    can't see across the gap: rename a field on one side and it compiles,
+    but e.g. saved triggers quietly lose their cooldown) and **trust** (the
+    page shows outside content: usernames, chat text, badge images; main
+    shouldn't accept arbitrary messages).
+  - What Electron itself recommends
+    ([IPC tutorial](https://www.electronjs.org/docs/latest/tutorial/ipc),
+    [security checklist](https://www.electronjs.org/docs/latest/tutorial/security)):
+    `invoke`/`handle` for renderer → main (not `sendSync` or send/reply);
+    `webContents.send` for main → renderer; **never expose `ipcRenderer`**,
+    expose narrow functions via `contextBridge` from preload; wrap listeners
+    so the page only gets the data, not the event object (item 20);
+    `contextIsolation` on (item 3); **validate the sender of every IPC
+    message** (item 17). Electron says nothing about TypeScript, and the
+    checklist has no explicit item on validating message *data*.
+  - Our additions: one shared contract file (every call: name + zod input +
+    zod output; every main → renderer event: name + zod payload), compiled
+    against by main, preload and renderer, so mismatches are compile errors;
+    main runs each input through its schema (and checks the sender) before
+    any handler code. Errors come back as explicit `{ ok, error: { code,
+    message } }` (thrown errors lose their type and get wrapped crossing
+    IPC). Handlers are plain async functions, testable in Vitest without
+    Electron; only the small `ipcMain` glue needs Electron. Maybe 50–100
+    lines.
+  - Libraries looked at:
+    - `electron-better-ipc` (3.0.0, 2026-10, Electron 44+): adds main →
+      renderer request/reply with `await`, renderer ↔ renderer calls, whole
+      error objects (`serialize-error`), the sender window, and shared
+      channel types, but "the types are not checked at runtime" (so no
+      answer to trust). We don't need its main point (our main → renderer
+      messages are one-way notices; one window).
+    - `@electron-toolkit/typed-ipc` (1.0.2, 2024): compile-time types only.
+    - `electron-trpc` (0.7.1, 2024): unreleased since 2024.
+    - `electron-typed-ipc` (2020), `typed-ipc` (2021), `interprocess`
+      (2023): dead or near it. `electron-ipc-cat` (2026-07): not looked
+      into.
+    - A [teamdev.com blog post](https://teamdev.com/mobrowser/blog/what-is-wrong-with-electron-ipc-and-how-to-fix-it/)
+      on Electron IPC's problems: nothing we could use.
 - **Python tools stay** as discovery tools and as the reference for the TS
   port: local-only parity tests that the TS output is byte-identical to the
   Python output (like `tools/roundtrip.py`).
@@ -146,8 +190,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 - **Rest of the frontend stack** (proposed, not decided):
 
-  - Typed IPC: our own small shared contract (call names + zod schemas)
-    rather than `electron-trpc` (last release 2024).
   - Stored settings: our own JSON files in Electron's userData folder, zod +
     atomic writes, rather than `electron-store`.
   - Lint/format: Biome or ESLint + Prettier (Forge's template sets up
