@@ -115,6 +115,13 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   is the fallback. The Twitch logo is one icon: take it as an SVG from
   `@fortawesome/free-brands-svg-icons` (CC BY 4.0) instead of loading Font
   Awesome's CSS from a CDN.
+- **Validation: zod (v4).** One schema gives both the TS type and a runtime
+  check, for data from outside the code: saved settings/trigger files
+  (older versions, hand edits, half-written files), every IPC message from
+  the renderer in main (Electron treats the renderer as untrusted), and the
+  saved Twitch tokens (corrupt → "log in again"). Twurple's events are
+  already typed. Alternatives looked at: Valibot (smaller; size doesn't
+  matter on desktop), ArkType, TypeBox, hand-written checks.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -134,8 +141,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 - **Rest of the frontend stack** (proposed, not decided):
 
-  - **zod**: check settings/trigger files on load, and validate everything
-    arriving from the renderer over IPC in main (renderer is untrusted).
   - Forms: TanStack Form (matches the stack, takes zod schemas) or
     react-hook-form (shadcn's older examples).
   - Typed IPC: our own small shared contract (call names + zod schemas)
