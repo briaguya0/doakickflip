@@ -34,7 +34,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
     the session log, Twitch connection state. Pushes from main (a new yell
     in the log, Twitch dropping) update the cache. We'll see where it's most
     useful once we start building.
-  - TanStack Form maybe later for the trigger editor.
 - **Process layout:** main (Node: files, mod, inbox, Twitch, stored
   settings/tokens) ↔ preload (small typed `window.api` via
   `contextBridge`) ↔ renderer (React, no Node). `contextIsolation` on,
@@ -122,6 +121,12 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   saved Twitch tokens (corrupt → "log in again"). Twurple's events are
   already typed. Alternatives looked at: Valibot (smaller; size doesn't
   matter on desktop), ArkType, TypeBox, hand-written checks.
+- **No form library yet.** Most of the app saves instantly (toggles, quick
+  settings) or is a single field (channel name, THUG Pro folder). The
+  trigger editor is the only real form: build it with plain React state +
+  its zod schema. If it gets awkward (change tracking, conditional fields,
+  async checks like "command already used"), add TanStack Form then (it
+  takes zod schemas); react-hook-form is the other option.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
@@ -141,8 +146,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 - **Rest of the frontend stack** (proposed, not decided):
 
-  - Forms: TanStack Form (matches the stack, takes zod schemas) or
-    react-hook-form (shadcn's older examples).
   - Typed IPC: our own small shared contract (call names + zod schemas)
     rather than `electron-trpc` (last release 2024).
   - Stored settings: our own JSON files in Electron's userData folder, zod +
