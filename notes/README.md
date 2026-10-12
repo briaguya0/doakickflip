@@ -5,7 +5,8 @@ goal, and building the "Do a Kickflip!" mode. The game data itself is never
 committed; run `tools/extract.py` to regenerate `extracted/` locally and follow
 along.
 
-Versions this was worked out against: THUG Pro 0.6.0.11 (`changelog.txt`) on a
+Versions this was worked out against: THUG Pro beta 0.7.0.0 (shown in the
+launcher; `changelog.txt`'s newest entry is 0.6.0.11, so don't go by it) on a
 retail PC THUG2 install.
 
 - [todo.md](todo.md): what's next and open questions

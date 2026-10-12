@@ -55,10 +55,12 @@ would patch the *old* scripts and install them over the update. Fix: notice
 when the live file isn't the one we installed (e.g. keep a hash of what we
 wrote) and treat it as the new original (refresh the backup from it).
 
-**THUG Pro 0.7.0.0 is out** (beta, per `dl.thugpro.com/current.json`,
-seen 2026-10-11); everything so far was worked out on 0.6.0.11. Check the
-pause-menu patch, the mod and the notes against 0.7 (first entry for the
-known-versions table in [architecture.md](architecture.md)).
+**Detecting the THUG Pro version.** The installed version is beta 0.7.0.0
+(launcher, and `dl.thugpro.com/current.json`); `changelog.txt`'s newest entry
+is 0.6.0.11, so the changelog is not a version source. For the app's Status
+check, identify versions by the SHA-256 of `data/pre/thugpro_qb.prx` (the
+known-versions table in [architecture.md](architecture.md)); find out where
+the launcher gets the version it displays if we want to show the label.
 
 Later:
 - Twitch bridge: a separate program that writes the inbox from Twitch chat
