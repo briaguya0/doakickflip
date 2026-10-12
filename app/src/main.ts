@@ -16,9 +16,9 @@ const createWindow = () => {
 
   // and load the index.html of the app.
   if (FRONTEND_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(FRONTEND_VITE_DEV_SERVER_URL);
+    void mainWindow.loadURL(FRONTEND_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadURL(`app://${FRONTEND_VITE_NAME}/index.html`);
+    void mainWindow.loadURL(`app://${FRONTEND_VITE_NAME}/index.html`);
   }
 
   // Open the DevTools.
@@ -28,7 +28,7 @@ const createWindow = () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+void app.whenReady().then(() => {
   protocol.handle(appScheme.scheme, handleAppProtocol);
   createWindow();
 
