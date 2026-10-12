@@ -80,7 +80,7 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
     restart from the pause menu). The counter has to be shown **in game**
     (one-way: the app can't know it).
   - **Twitch connection icon:** filled plug everywhere (card, nav tab, Twitch
-    page): `power_off` grey = not connected, `power` blue = connecting,
+    page): `power_off` grey = off by choice, `power` blue = connecting,
     `power` green = connected, `power_off` red = needs fixing.
   - **Red means "you need to fix this", not specifically "error"**, across
     the app: Settings' red `error` marker when THUG Pro isn't set up, the
