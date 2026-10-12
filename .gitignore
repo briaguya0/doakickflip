@@ -1,0 +1,12 @@
+# Nothing from THUG2 / THUG Pro may be committed: game installs, anything
+# extracted or decompiled from them, patched archives, logs, recordings.
+/thugpro/
+/extracted/
+/build/
+/logs/
+*.prx
+*.pre
+*.qb
+*.mp4
+*.webm
+*.mkv
