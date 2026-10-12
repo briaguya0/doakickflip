@@ -80,13 +80,13 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
     restart from the pause menu). The counter has to be shown **in game**
     (one-way: the app can't know it).
   - **Twitch connection icon:** filled plug everywhere (card, nav tab, Twitch
-    page): `power_off` grey = off by choice, `power` blue = connecting,
-    `power` green = connected, `power_off` red = needs fixing. Considered link, sensors, chat bubbles, cloud, sync, wifi_tethering and generic. Sail just uses dots, and puts errors in a banner with the message: worth copying.
+    page): `power_off` red = not connected (needs fixing), `power` blue =
+    connecting, `power` green = connected. No grey "off by choice" state:
+    not connected is red however it happened. Considered link, sensors, chat bubbles, cloud, sync, wifi_tethering and generic. Sail just uses dots, and puts errors in a banner with the message: worth copying.
   - **Red means "you need to fix this", not specifically "error"**, across
     the app: Settings' red `error` marker when THUG Pro isn't set up, the
     red unplugged Twitch icon when it's never been connected, the login
-    expired, or the connection failed. Grey = off because you chose it
-    (Stop, Log out).
+    expired, the connection failed, or you stopped / logged out.
   - **Session log** table: time, type (chat / test / sim only), user (Twitch
     style: name colour + badges), command (monospace), trick with its button
     combo. No headers, no subtitle.
