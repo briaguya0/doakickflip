@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol } from 'electron';
+import { app, BrowserWindow, nativeTheme, protocol } from 'electron';
 import path from 'node:path';
 import { appScheme, handleAppProtocol } from './protocol';
 
@@ -29,6 +29,7 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 void app.whenReady().then(() => {
+  nativeTheme.themeSource = 'dark';
   protocol.handle(appScheme.scheme, handleAppProtocol);
   createWindow();
 
