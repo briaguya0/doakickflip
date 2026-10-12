@@ -261,6 +261,12 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   takes zod schemas); react-hook-form is the other option.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
+- **Package manager: npm** (with nvm for Node). pnpm considered: works fine
+  with nvm (best via Corepack + a pinned `packageManager` field; Corepack is
+  bundled with Node 24 but not from Node 25), but Electron Forge's packaging
+  doesn't handle pnpm's symlinked `node_modules`, so it would need
+  `node-linker=hoisted`, giving up most of what pnpm offers. npm avoids the
+  Electron wrinkles.
 - **Testing:** **Vitest** (+ React Testing Library for components) for
   almost everything. **Playwright** only for what Vitest can't cover; there
   may not be much that's truly end-to-end. (Playwright can drive Electron:
@@ -276,9 +282,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Open
 
-- **Rest of the frontend stack** (proposed, not decided):
-  - Package manager: npm or pnpm (pnpm + Forge needs
-    `node-linker=hoisted`).
 - **After a login expires (30 days):** fall back to reading the same
   channel's chat so plain chat triggers keep working until you log in again?
 - **Reconnect on launch:** a setting, on by default? (Some streamers may not
