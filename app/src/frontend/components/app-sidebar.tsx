@@ -3,6 +3,7 @@ import {
   NumberCircleTwoIcon,
   StarFourIcon,
 } from '@phosphor-icons/react';
+import { Link, useMatchRoute } from '@tanstack/react-router';
 import {
   Sidebar,
   SidebarContent,
@@ -15,11 +16,13 @@ import {
 } from '@/components/ui/sidebar';
 
 const items = [
-  { title: 'Page 1', icon: NumberCircleOneIcon },
-  { title: 'Page 2', icon: NumberCircleTwoIcon },
-];
+  { title: 'Page 1', to: '/', icon: NumberCircleOneIcon },
+  { title: 'Page 2', to: '/page-2', icon: NumberCircleTwoIcon },
+] as const;
 
 export function AppSidebar() {
+  const matchRoute = useMatchRoute();
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -43,7 +46,8 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    isActive={item.title === 'Page 1'}
+                    render={<Link to={item.to} />}
+                    isActive={!!matchRoute({ to: item.to })}
                     tooltip={item.title}
                   >
                     <item.icon />

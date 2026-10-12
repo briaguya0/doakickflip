@@ -1,5 +1,18 @@
+import {
+  createHashHistory,
+  createRouter,
+  RouterProvider,
+} from '@tanstack/react-router';
 import { createRoot } from 'react-dom/client';
-import { App } from './App';
+import { routeTree } from './routeTree.gen';
+
+const router = createRouter({ routeTree, history: createHashHistory() });
+
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
 
 const rootElement = document.getElementById('app');
 if (!rootElement) {
@@ -7,5 +20,5 @@ if (!rootElement) {
 }
 
 if (!rootElement.innerHTML) {
-  createRoot(rootElement).render(<App />);
+  createRoot(rootElement).render(<RouterProvider router={router} />);
 }
