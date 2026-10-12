@@ -26,18 +26,14 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" variant="inset">
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" render={<div />}>
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <StarFourIcon />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Do a Kickflip</span>
-              </div>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <div className="flex h-12 items-center gap-2 overflow-hidden transition-[width] group-data-[collapsible=icon]:w-8">
+          <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg">
+            <StarFourIcon />
+          </div>
+          <span className="text-sm font-medium whitespace-nowrap">
+            Do a Kickflip
+          </span>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
