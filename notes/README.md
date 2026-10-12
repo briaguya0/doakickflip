@@ -20,5 +20,6 @@ retail PC THUG2 install.
 - [formats.md](formats.md): PRE/PRX archives, QB keys, QB bytecode
 - [scripts.md](scripts.md): where things live in the game's scripts
 - [skate-tricks-goal.md](skate-tricks-goal.md): the stock Skate-Tricks goal and its engine internals
+- [thugpro-versions.md](thugpro-versions.md): installer, updater manifests (CRC32 per file), reading the version from `thugpro.dll`
 - [file-redirect.md](file-redirect.md): THUG Pro's `Data\` file redirect and `User\Data`
 - [input-channels.md](input-channels.md): ways to get live input into the game

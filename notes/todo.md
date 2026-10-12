@@ -1,5 +1,13 @@
 # Next steps
 
+**Next session (left 2026-10-11):** architecture is settled (see
+[architecture.md](architecture.md), "Open" has only one thing to check);
+the prototype is reviewed except the rest of Settings. Fresh findings on
+THUG Pro versions and its updater are in
+[thugpro-versions.md](thugpro-versions.md); the items below on version
+detection, the updater reverting the mod, and the `.bak` bug follow from
+them. Lots of local commits on `file-read-discovery` aren't pushed.
+
 **Current focus: the frontend.** Reviewing the static prototype page by page;
 see [frontend.md](frontend.md) for where it stands and what's next.
 
@@ -54,13 +62,22 @@ overwrites `thugpro_qb.prx` but leaves our old `.bak`, so the next build
 would patch the *old* scripts and install them over the update. Fix: notice
 when the live file isn't the one we installed (e.g. keep a hash of what we
 wrote) and treat it as the new original (refresh the backup from it).
+Better: match the live file's CRC32 against THUG Pro's published manifest
+CRCs (see [thugpro-versions.md](thugpro-versions.md)): an official CRC means
+a fresh original.
 
-**Detecting the THUG Pro version.** The installed version is beta 0.7.0.0
-(launcher, and `dl.thugpro.com/current.json`); `changelog.txt`'s newest entry
-is 0.6.0.11, so the changelog is not a version source. For the app's Status
-check, identify versions by the SHA-256 of `data/pre/thugpro_qb.prx` (the
-known-versions table in [architecture.md](architecture.md)); find out where
-the launcher gets the version it displays if we want to show the label.
+**Does THUG Pro's launcher undo the mod?** Its updater validates every file
+by CRC32 against the release manifest, so our patched `thugpro_qb.prx`
+looks damaged. Test whether opening the launcher (or only Repair / an
+update) re-downloads it. If it does on every start, the app needs to know
+(and say so) and the mod may need re-installing after the launcher runs.
+
+**Detecting the THUG Pro version.** Plan (details in
+[thugpro-versions.md](thugpro-versions.md)): read the label from
+`thugpro.dll` (the four pushes before its single `%d.%d.%d.%d` reference;
+0.7.0.0 today), and decide tested/safe from a known-versions table of CRC32s
+seeded from THUG Pro's `update/<release>/<version>/update.json` manifests.
+`changelog.txt` is not a version source (stale at 0.6.0.11).
 
 Later:
 - Twitch bridge: a separate program that writes the inbox from Twitch chat

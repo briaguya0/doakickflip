@@ -192,7 +192,9 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
      port matches the Python reference. Only **fingerprints** are committed
      (SHA-256 of each THUG Pro version's `thugpro_qb.prx` + "verified"),
      which doubles as a **known-versions table** for the app's "untested
-     THUG Pro version" status.
+     THUG Pro version" status. The table can also be **seeded from THUG Pro's
+     published update manifests** (a CRC32 per file per release; see
+     [thugpro-versions.md](thugpro-versions.md)), not only from local runs.
   - Considered and dropped: pulling THUG Pro in CI. `THUGProSetup.exe`
     (dl.thugpro.com, a 600 KB .NET downloader) doesn't contain the files: it
     reads `current.json` (release/version) and fetches files via
