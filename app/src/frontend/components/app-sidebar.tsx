@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useIcon, useTitle } from '@/hooks/use-static-data';
 
-const nav = ['/', '/page-2'] as const;
+const nav = ['/', '/triggers', '/twitch', '/settings'] as const;
 
 export function AppSidebar() {
   return (

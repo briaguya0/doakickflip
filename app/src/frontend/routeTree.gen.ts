@@ -10,43 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as Page2RouteImport } from './routes/page-2'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as TriggersRouteImport } from './routes/triggers'
+import { Route as TwitchRouteImport } from './routes/twitch'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Page2Route = Page2RouteImport.update({
-  id: '/page-2',
-  path: '/page-2',
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TriggersRoute = TriggersRouteImport.update({
+  id: '/triggers',
+  path: '/triggers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TwitchRoute = TwitchRouteImport.update({
+  id: '/twitch',
+  path: '/twitch',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/page-2': typeof Page2Route
+  '/settings': typeof SettingsRoute
+  '/triggers': typeof TriggersRoute
+  '/twitch': typeof TwitchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/page-2': typeof Page2Route
+  '/settings': typeof SettingsRoute
+  '/triggers': typeof TriggersRoute
+  '/twitch': typeof TwitchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/page-2': typeof Page2Route
+  '/settings': typeof SettingsRoute
+  '/triggers': typeof TriggersRoute
+  '/twitch': typeof TwitchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/page-2'
+  fullPaths: '/' | '/settings' | '/triggers' | '/twitch'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/page-2'
-  id: '__root__' | '/' | '/page-2'
+  to: '/' | '/settings' | '/triggers' | '/twitch'
+  id: '__root__' | '/' | '/settings' | '/triggers' | '/twitch'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  Page2Route: typeof Page2Route
+  SettingsRoute: typeof SettingsRoute
+  TriggersRoute: typeof TriggersRoute
+  TwitchRoute: typeof TwitchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,11 +78,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/page-2': {
-      id: '/page-2'
-      path: '/page-2'
-      fullPath: '/page-2'
-      preLoaderRoute: typeof Page2RouteImport
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/triggers': {
+      id: '/triggers'
+      path: '/triggers'
+      fullPath: '/triggers'
+      preLoaderRoute: typeof TriggersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/twitch': {
+      id: '/twitch'
+      path: '/twitch'
+      fullPath: '/twitch'
+      preLoaderRoute: typeof TwitchRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -70,7 +104,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  Page2Route: Page2Route,
+  SettingsRoute: SettingsRoute,
+  TriggersRoute: TriggersRoute,
+  TwitchRoute: TwitchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
