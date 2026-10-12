@@ -55,6 +55,11 @@ would patch the *old* scripts and install them over the update. Fix: notice
 when the live file isn't the one we installed (e.g. keep a hash of what we
 wrote) and treat it as the new original (refresh the backup from it).
 
+**THUG Pro 0.7.0.0 is out** (beta, per `dl.thugpro.com/current.json`,
+seen 2026-10-11); everything so far was worked out on 0.6.0.11. Check the
+pause-menu patch, the mod and the notes against 0.7 (first entry for the
+known-versions table in [architecture.md](architecture.md)).
+
 Later:
 - Twitch bridge: a separate program that writes the inbox from Twitch chat
   (anonymous IRC read is enough), with name aliases and flood control

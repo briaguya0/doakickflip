@@ -170,6 +170,40 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
       Vite, partial use is undocumented (risk of two Vites), and its Node
       management overlaps `.nvmrc`. We use the same oxlint/oxfmt directly;
       revisit later.
+- **Test fixtures: our own, nothing from THUG2 or THUG Pro committed.**
+  Layers:
+  1. **Format correctness, fully synthetic:** our code against the formats
+     as documented in [formats.md](formats.md): LZSS on random data and
+     edge cases (ring wrap, threshold, uncompressed entries), PRX pack ↔
+     unpack, QB compile → decompile → compile byte-identical. For bytecode,
+     borrow only *which features* real files use (opcodes, fast-if/Random
+     variants, line numbers: facts) and write our own scripts exercising
+     each; `roundtrip.py`'s skipped files show what the compiler still
+     can't do.
+  2. **Patch logic, hand-written scripts** for each case: hook block once,
+     nested `if`s inside it, several `is_singlesession` blocks with only one
+     holding the High Score Run items, block missing (clear error, no broken
+     archive), already patched, uninstall restoring byte-for-byte, the
+     `.bak` bug. They repeat only the few names the patcher looks for, as
+     `mod/doakickflip.q` already does. Archives are built at test time by
+     our own tools (only source text committed).
+  3. **Real game, local and opt-in** (pointed at a THUG Pro folder, e.g.
+     `THUGPRO_DIR`; never on public CI): the real patch works, and the TS
+     port matches the Python reference. Only **fingerprints** are committed
+     (SHA-256 of each THUG Pro version's `thugpro_qb.prx` + "verified"),
+     which doubles as a **known-versions table** for the app's "untested
+     THUG Pro version" status.
+  - Considered and dropped: pulling THUG Pro in CI. `THUGProSetup.exe`
+    (dl.thugpro.com, a 600 KB .NET downloader) doesn't contain the files: it
+    reads `current.json` (release/version) and fetches files via
+    `update/…/update.json` (it names `data/pre/thugpro_qb.prx`); our guesses
+    at that URL got 403. Feasible after decompiling the downloader, but it
+    means scripting their updater (server load, their permission), public-CI
+    leak risks (artifacts/snapshots/logs), tests going red when THUG Pro
+    updates, and the archive's copyright status (THUG Pro scripts grew out
+    of THUG2's) isn't simple.
+  - What stays hard: noticing a THUG Pro change nobody has run the local
+    tests on yet; the known-versions table at least shows it as "untested".
 - **Python tools stay** as discovery tools and as the reference for the TS
   port: local-only parity tests that the TS output is byte-identical to the
   Python output (like `tools/roundtrip.py`).
@@ -294,11 +328,3 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Open
 
-- **Test fixtures for mod install.** Nothing from THUG2 or THUG Pro can be
-  committed. Idea: a hand-written fake pause-menu script with the same shape
-  as the hook point (`if GameModeEquals is_singlesession` … `endif`),
-  compiled and packed into a fake `thugpro_qb.prx` by our own tools. It
-  repeats a few of the game's script names, as `mod/doakickflip.q` already
-  does: is that acceptable?
-- **Real-install tests:** opt-in, only when pointed at a THUG Pro folder
-  (e.g. `THUGPRO_DIR`); never on public CI; outputs never committed.
