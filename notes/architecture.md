@@ -227,9 +227,15 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
     - Opened again within 4h, or within 30 days: reconnects the way it was
       left, no clicks (a quiet refresh after 4h; each refresh restarts the
       30 days). Read chat never expires.
-    - After 30 days unused (logged in): the refresh fails; the Twitch page
-      says the login expired and shows the two options; triggers that need
-      a login show "Needs login".
+    - After 30 days unused (logged in): the refresh fails; nothing
+      connects. The sidebar's Twitch marker and the Dashboard Status row go
+      **red** (`power_off`, the "needs addressing" state); the Twitch page
+      shows the two options again with the login-expired message. **No
+      fallback** to reading chat: it would add a "reading because the login
+      expired" state and hide that redeems don't work (viewers spending
+      points on rewards that do nothing). It only happens after 30 days
+      without opening the app, so in practice at launch, before going live
+      (tokens refresh on their own while running).
 - **UI components: shadcn/ui on Base UI, with Tailwind CSS v4.** shadcn
   copies component source into the repo (we own and restyle it) rather than
   being a dependency; it can sit on Base UI, React Aria or Radix, and Base UI
@@ -282,8 +288,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Open
 
-- **After a login expires (30 days):** fall back to reading the same
-  channel's chat so plain chat triggers keep working until you log in again?
 - **Reconnect on launch:** a setting, on by default? (Some streamers may not
   want the app talking to Twitch the moment it opens.)
 - **Test fixtures for mod install.** Nothing from THUG2 or THUG Pro can be
