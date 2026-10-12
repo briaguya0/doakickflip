@@ -473,6 +473,71 @@ above:
   a logo/standalone pack; fixed stroke), Lucide. All covered our icon
   list. Phosphor's React package was last released 2025-05. Keep the
   official Twitch logo (brand rules), not a library's Twitch icon.
+- **shadcn Button** added with `init` (`shadcn add` asks before overwriting
+  an existing file; `--overwrite` then oxfmt leaves our formatted copy
+  unchanged). Phosphor's current exports are the `…Icon` names
+  (`SquaresFourIcon`); the bare names are deprecated.
+- **Sidebar: shadcn's `Sidebar`** (`shadcn add sidebar`: sidebar, tooltip,
+  separator, skeleton, input; no new packages).
+  - **Desktop only:** all mobile handling removed from the generated
+    `sidebar.tsx` (the `use-mobile` hook, `isMobile`/`openMobile`, the
+    `Sheet` slide-over, `hidden md:…` gates, mobile-only tooltip hiding,
+    `md:` touch tweaks), so it never disappears or covers the page at narrow
+    widths (it switched to a slide-over below 768px). `sheet.tsx` and
+    `use-mobile.ts` deleted. File comment: "shadcn generated component
+    modified to be desktop only". Re-running `shadcn add sidebar` would
+    bring the mobile code back.
+  - Before that: shadcn's `use-mobile` hook fails the compiler rule
+    `set-state-in-effect`; known upstream (issue #8739, #11030; unmerged
+    fixes PR #11045 and #11603, both `useSyncExternalStore`). We'd applied
+    #11045's registry version (no SSR guards needed in Electron) before
+    removing the hook entirely.
+  - `collapsible="icon"` (default `offcanvas` slides fully away); menu
+    buttons have `tooltip`s for the collapsed rail.
+  - Header uses shadcn's block pattern (`sidebar-07`):
+    `SidebarMenuButton size="lg"` with a `size-8` logo tile + name, rendered
+    as a `div` (not a link). Without anything in that spot, collapsing
+    looked jumpy; shadcn shrinks buttons on collapse (lg `h-14`, default
+    `h-9` → `size-8`), which is fine once the header tile is there.
+  - Placeholder nav: "Page 1" / "Page 2" (not our real sections yet); logo
+    is a placeholder Phosphor icon. Our Twitch nav item, when it exists,
+    should use the official Twitch logo (brand rules), not Phosphor's.
+- **Mount guard:** `index.html` has `<div id="app"></div>`;
+  `src/frontend/index.tsx` gets it, throws if missing (no `!`), and only
+  renders if it's empty (TanStack's quickstart guard against re-running the
+  entry in dev). Previously mounted on `document.body` (from Forge's React
+  guide; React advises against it).
+- **TanStack Router, file-based.** Tried code-based (`createRoute` +
+  `addChildren`, no plugin, no generated file) and went back to file-based.
+  (`<Routes>`/`<Route>` JSX is React Router's API, not TanStack's: TanStack
+  builds the tree as objects so `Link to=` etc. are typed.)
+  - `@tanstack/react-router` (dependency), `@tanstack/router-plugin` (dev).
+    Plugin before `react()` with only `routesDirectory:
+    './src/frontend/routes'` and `generatedRouteTree:
+    './src/frontend/routeTree.gen.ts'` (defaults would put routes in
+    `src/`, next to Electron's main-process files). `target` defaults to
+    `react` (checked the plugin's config schema); `autoCodeSplitting` is
+    opt-in and off (everything loads from local disk; one bundle).
+  - **`routeTree.gen.ts` is committed** (TanStack FAQ: "it is essentially
+    part of your application's runtime, not a build artifact"; their
+    examples commit it) and ignored by oxfmt and oxlint (`ignorePatterns`;
+    the file's header asks for that). The plugin regenerates it in dev and
+    build.
+  - **Hash history** (`createHashHistory`): with `app://`, a reload of a
+    non-hash URL would ask the protocol handler for a file that doesn't
+    exist. TanStack recommends hash history for environments without a
+    server. Verified: navigate, reload on Page 2, back.
+  - Router created in `index.tsx` (as in TanStack's quickstart); move it to
+    `router.tsx` when it grows (e.g. router context for the Query client).
+  - Layout (sidebar + `<Outlet />`) is `routes/__root.tsx` (was
+    `App.tsx`); pages `routes/index.tsx` (`/`), `routes/page-2.tsx`.
+    Sidebar items: `SidebarMenuButton render={<Link to=… />}` with
+    `isActive` from `useMatchRoute()`.
+- **Dev check gotcha:** the first `npm start` after adding packages
+  pre-bundles them and reloads the page; probe after that settles.
+- Testing the window: below 768px used to trigger shadcn's mobile mode (the
+  default window is 800×600); moot now. Force a viewport with
+  `Emulation.setDeviceMetricsOverride` when screenshotting.
 - **Known audit finding:** `braces` ≤ 3.0.3 (GHSA-vfj7-8cjw-p6xm, stack
   exhaustion via nested patterns, published 2026-09-18) has **no fixed
   version yet**; it comes in only through the `shadcn` CLI (`fast-glob` →

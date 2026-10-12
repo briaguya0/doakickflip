@@ -2,11 +2,12 @@
 
 **App scaffold (2026-10-12):** the real app is being built in `app/` on the
 `app-scaffold` branch (worktree `../doakickflip-app`), one small reviewed
-commit at a time; decisions so far are in [architecture.md](architecture.md)
+commit at a time; decisions are in [architecture.md](architecture.md)
 ("App scaffold"). Done: template review, ZIP-only packaging, `app://`
-protocol + fuse, TS 7, type-aware lint, React. Next on the list: Tailwind
-(+ oxfmt class sorting), shadcn/ui, TanStack Router + Query, Vitest + RTL,
-Material Symbols, commitlint; CSP (below).
+protocol + fuse, TS 7, type-aware lint, React + compiler, Tailwind,
+shadcn (Maia, Phosphor) + desktop-only sidebar, mount guard, TanStack
+Router (file-based, hash history). Next: TanStack Query, Vitest + RTL,
+commitlint; CSP (below); real pages instead of Page 1 / Page 2.
 
 **Next session (left 2026-10-11):** architecture is settled (see
 [architecture.md](architecture.md), "Open" has only one thing to check);
