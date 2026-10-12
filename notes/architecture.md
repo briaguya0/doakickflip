@@ -328,3 +328,7 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Open
 
+Nothing undecided. To check before relying on it:
+- What reading chat **without a login** really delivers (messages and
+  cheers assumed; sub notices probably too), against Twitch's docs, before
+  the Twitch page's Read chat ticks/crosses are final.
