@@ -369,6 +369,72 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
     settings block; read back with our own decoder.
   - Trigger matching (`!doa nose manual`, allowed tricks).
 
+## App scaffold (`app-scaffold` branch)
+
+The real app lives in `app/` on the `app-scaffold` branch, built in small
+reviewed commits on top of the repo's initial commit (worktree at
+`../doakickflip-app`). Decisions made while building it, beyond the ones
+above:
+
+- **Renderer named `frontend`** (Forge's `name: 'main_window'` renamed).
+  Lowercase on purpose: URL hosts are case-insensitive and get lowercased,
+  so `app://kickflipFrontend/` would arrive as `kickflipfrontend` and fail
+  the handler's host check. Forge derives `FRONTEND_VITE_NAME` /
+  `FRONTEND_VITE_DEV_SERVER_URL` from the name (upper snake case) and
+  injects them at build time; they're declared in `src/declarations.d.ts`
+  ourselves (dev URL as `string | undefined`, which is what it is in
+  packaged builds) instead of referencing Forge's `forge-vite-env` types,
+  which hard-code `MAIN_WINDOW_*`.
+- **Output layout:** main/preload build to `.vite/build/`, each renderer to
+  `.vite/renderer/<name>/` (same inside `app.asar`), hence
+  `../renderer/frontend` from main's `__dirname` (main is bundled to CJS,
+  so `__dirname` exists despite `"type": "module"`).
+- **`src/protocol.ts`** exports the `appScheme` (`CustomScheme`) and
+  `handleAppProtocol`; `main.ts` calls `protocol.registerSchemesAsPrivileged`
+  and `protocol.handle` itself. `isInRendererDir(file)` is the
+  path-traversal check (also rejects the renderer dir itself). Verified
+  with the packaged app: page loads over `app://`, other hosts, `../` and
+  `%2e%2e` escapes and `file://` fetches all fail.
+- **TypeScript 7:** `esModuleInterop` removed from tsconfig (always on;
+  `false` is an error in 7) and `noImplicitAny` (covered by `strict`,
+  which is the default since TS 6; checked). Other options left alone.
+  `skipLibCheck` is required (a Forge dependency's types don't check).
+  Node types come through Electron's own `@types/node` dependency.
+- **oxlint:** `options.typeAware: true` in the config (not a CLI flag, so
+  every runner agrees) with `oxlint-tsgolint`; `correctness` is `'error'`
+  so CI fails on it. The three floating promises in the template's
+  `main.ts` (`loadURL` ×2, `app.whenReady().then`) are marked `void`.
+  Skipped for now: `no-misused-promises`, `no-deprecated`. Needs Node 24
+  (`nvm use`): Node 20 can't load the `.ts` config.
+- **`package.json`:** `name` and `productName` both `doakickflip`.
+  `productName` names the executable, the ZIP and the settings folder
+  (`app.getName()` → `~/.config/<productName>`, `%APPDATA%\<productName>`),
+  so no emoji or punctuation there; the window title comes from
+  `index.html`'s `<title>`. License MIT, `LICENSE` at the repo root.
+- **React** added per Forge's React guide (written for its Webpack
+  template, works as is with Vite): `"jsx": "react-jsx"`, `src/frontend/
+  app.tsx` rendering into `document.body`, imported from `renderer.ts`.
+  Vite's React plugin (Fast Refresh) not added (optional later).
+- **Folder layout:** Electron entry points and wiring at `src/` (`main.ts`,
+  `preload.ts`, `protocol.ts`, `renderer.ts`); `src/frontend/` for the
+  renderer (React). Main-side code goes in sibling folders when it exists,
+  e.g. `game/` or `thugpro/` (not `mod/`: clashes with the repo's QB mod
+  source folder) and `twitch/`; the IPC contract (used by main, preload and
+  frontend) in `shared/` or `ipc/`. Later: separate tsconfigs for
+  `frontend/` (DOM) and the main side (Node) so a wrong-side import is a
+  type error, not a build failure. (Alternative considered: by process,
+  `src/main/`, `src/preload/`, `src/renderer/`, electron-vite style.)
+- **Install scripts:** npm 11 holds back packages' install scripts until
+  approved; none pending since the Squirrel maker (`electron-winstaller`)
+  went. Electron 44 downloads its binary on first run, not at install.
+- **Verifying the running app:** launch with `--remote-debugging-port=N`
+  (packaged binary, or `npx electron-forge start -- --remote-debugging-port=N`)
+  and use the Chrome DevTools Protocol from a small Node script
+  (`/json` for the page list, `Runtime.evaluate` / console events over the
+  page's WebSocket) to check the URL, rendered DOM, console warnings, and
+  `fetch` results. Stop test processes by their full binary path (a
+  `pkill -f` pattern that also matches the calling shell kills the shell).
+
 ## Open
 
 Nothing undecided. To check before relying on it:

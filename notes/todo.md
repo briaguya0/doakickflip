@@ -1,5 +1,13 @@
 # Next steps
 
+**App scaffold (2026-10-12):** the real app is being built in `app/` on the
+`app-scaffold` branch (worktree `../doakickflip-app`), one small reviewed
+commit at a time; decisions so far are in [architecture.md](architecture.md)
+("App scaffold"). Done: template review, ZIP-only packaging, `app://`
+protocol + fuse, TS 7, type-aware lint, React. Next on the list: Tailwind
+(+ oxfmt class sorting), shadcn/ui, TanStack Router + Query, Vitest + RTL,
+Material Symbols, commitlint; CSP (below).
+
 **Next session (left 2026-10-11):** architecture is settled (see
 [architecture.md](architecture.md), "Open" has only one thing to check);
 the prototype is reviewed except the rest of Settings. Fresh findings on
@@ -78,6 +86,18 @@ update) re-downloads it. If it does on every start, the app needs to know
 0.7.0.0 today), and decide tested/safe from a known-versions table of CRC32s
 seeded from THUG Pro's `update/<release>/<version>/update.json` manifests.
 `changelog.txt` is not a version source (stale at 0.6.0.11).
+
+**App: Content-Security-Policy** (Electron security checklist item 7;
+Electron warns in dev). Do it as a **response header** set by our `app://`
+handler for packaged builds (strict), rather than a `<meta>` tag (one
+policy for dev and prod, so it'd have to allow Vite's inline styles and dev
+WebSocket). Intended policy: `default-src 'self'`; `script-src 'self'`;
+`style-src 'self'` (dev needs `'unsafe-inline'`: Vite injects `<style>`);
+`font-src 'self'`; `img-src 'self'` (+ `data:`, + Twitch's CDN
+`https://static-cdn.jtvnw.net` only once we show badges/emotes);
+`connect-src 'self'` (dev: Vite's WebSocket; the renderer never talks to
+Twitch, main does); `object-src`, `base-uri`, `form-action` `'none'`.
+Electron's checklist also shows `session.webRequest.onHeadersReceived`.
 
 Later:
 - Twitch bridge: a separate program that writes the inbox from Twitch chat
