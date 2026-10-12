@@ -287,7 +287,8 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   controls → Toggle Group, toggles → Switch, sliders → Slider, kind chips →
   Toggle, edit card → Card, toasts → Sonner, and the trick picker → Command
   (cmdk) in a Popover/Dialog.
-- **Icons: Material Symbols from npm** (`material-symbols`, Apache 2.0,
+- **Icons: ~~Material Symbols from npm~~ superseded by Phosphor (see App
+  scaffold).** Was: Material Symbols from npm (`material-symbols`, Apache 2.0,
   0.48.0, 2026-10), bundled with the app, so nothing hits Google Fonts (the
   prototype loads it from there). shadcn's default Lucide not used. Check
   the package's variable font keeps the axes the prototype uses (FILL, wght
@@ -424,6 +425,59 @@ above:
   `frontend/` (DOM) and the main side (Node) so a wrong-side import is a
   type error, not a build failure. (Alternative considered: by process,
   `src/main/`, `src/preload/`, `src/renderer/`, electron-vite style.)
+- **React compiler:** `@vitejs/plugin-react` (its own commit) with
+  `react({ compiler: true })` + `oxc-transform-react` (Oxc path, per
+  https://oxc.rs/blog/2026-08-18-react-compiler-support; the Vite
+  integration is marked experimental). Verified on a throwaway component:
+  compiled output uses `react/compiler-runtime`'s cache. Lint: oxlint's
+  `react` plugin runs the compiler's rules natively (12 in `correctness`
+  incl. `void-use-memo`), no `eslint-plugin-react-hooks`. `plugins` is
+  listed in full (`eslint`, `typescript`, `unicorn`, `oxc`, `react`):
+  setting `plugins` replaces the defaults (the blog's `["react"]` snippet
+  silently drops the `typescript` plugin, incl. `no-floating-promises`;
+  tested). `overrides` with `plugins: ['react']` also kept the defaults in
+  testing, but the docs don't say override plugins merge, and `extends`
+  only takes our own configs; we chose to just list them.
+- **Tailwind CSS v4** per its Vite guide (both packages as regular
+  dependencies, as the guide has it; in our setup only the bundle is
+  packaged, so dependency vs devDependency doesn't change what ships).
+  `index.css` is only the Tailwind import (template body styles dropped);
+  oxfmt `sortTailwindcss: true` (verified it reorders classes).
+- **Frontend entry vs component:** `src/frontend/index.tsx` (createRoot,
+  renders `<App />`) and `src/frontend/App.tsx` (the root component).
+  Vite's template calls the entry `main.tsx`; not used here to avoid
+  confusion with Electron's `main.ts`. File casing: PascalCase for React
+  components we write, kebab-case for shadcn's generated ones.
+- **shadcn/ui:** Base UI with the **Maia** style ("soft and rounded, with
+  generous spacing"; Nova, the CLI default, was tried first; Rhea and Luma
+  were also liked). `@/` → `src/frontend/` (tsconfig `paths` without
+  `baseUrl`, which type-aware oxlint doesn't support; Vite alias via
+  `import.meta.dirname`). shadcn's CLI only detects Vite via a
+  `vite.config.*` file, so run it with a temporary
+  `vite.config.ts` containing `export { default } from
+  './vite.renderer.config';` and delete it after. Generated files get
+  reformatted by oxfmt. The style lives in each component's classes, not
+  in `index.css` (the CSS is the same for every style apart from the
+  font). Font: Figtree (from the Maia preset), bundled via fontsource.
+  `shadcn` itself is a **devDependency** (only its `tailwind.css` is read
+  at build time). Generated components import `cn` from the `cn` package
+  directly.
+- **Icons: Phosphor** (`@phosphor-icons/react`, MIT), set as shadcn's
+  `iconLibrary` (replacing Maia's default Hugeicons) and **replacing the
+  earlier Material Symbols decision** for our own icons. Why: every icon
+  in six weights (`thin`, `light`, `regular`, `bold`, `fill`, `duotone`),
+  so filled state icons and heavy combo arrows are one prop, like
+  Material's axes were. Compared: Hugeicons free (outline only; filled is
+  Pro), Tabler (MIT, most icons, very active, `…Filled` for many, stroke
+  width), Remix (custom Remix Icon License 1.0: fine for apps, but not as
+  a logo/standalone pack; fixed stroke), Lucide. All covered our icon
+  list. Phosphor's React package was last released 2025-05. Keep the
+  official Twitch logo (brand rules), not a library's Twitch icon.
+- **Known audit finding:** `braces` ≤ 3.0.3 (GHSA-vfj7-8cjw-p6xm, stack
+  exhaustion via nested patterns, published 2026-09-18) has **no fixed
+  version yet**; it comes in only through the `shadcn` CLI (`fast-glob` →
+  `micromatch` → `braces`), a dev dependency that never ships. npm's
+  suggested "fix" (shadcn 1.0.0) is a downgrade. Recheck later.
 - **Install scripts:** npm 11 holds back packages' install scripts until
   approved; none pending since the Squirrel maker (`electron-winstaller`)
   went. Electron 44 downloads its binary on first run, not at install.
