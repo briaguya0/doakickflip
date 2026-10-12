@@ -134,6 +134,42 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
     (via `conf`) already relies on.
   - Plan: a shorter `timeout` (~1–2 s) for inbox writes, the default for
     settings.
+- **Lint / format: oxlint + oxfmt** (Oxc / VoidZero, MIT; oxlint 1.87,
+  oxfmt 0.72 as of 2026-10). Fallback if something specific doesn't work:
+  add ESLint for just those rules, with `eslint-plugin-oxlint` turning off
+  everything oxlint already covers.
+  - oxlint: 870+ built-in rules (ESLint core, TypeScript, React, import,
+    jsx-a11y, unicorn, Vitest; check the React hooks rules are there).
+    **Type-aware** via `oxlint-tsgolint` + `--type-aware` (or
+    `options.typeAware`), using the TypeScript 7 Go compiler: 59 of 61
+    typescript-eslint type-aware rules incl. `typescript/no-floating-promises`
+    (forgotten awaits in main-process file/IPC/Twitch code). Needs
+    TypeScript 7+ (7.0.2 out since 2026-07) and no legacy tsconfig options
+    like `baseUrl` (shadcn's Vite steps add it; `paths` works without).
+  - Config is its own `.oxlintrc.json` / `oxlint.config.ts` (ESLint-shaped;
+    doesn't read `eslint.config.js`; `@oxlint/migrate` converts once).
+    Existing ESLint plugins go under `jsPlugins` (alpha; plugin rules that
+    need type info aren't supported): try `@tanstack/eslint-plugin-query`
+    and `@tanstack/eslint-plugin-router` there.
+  - oxfmt: Prettier-compatible formatter, pre-1.0 (the main risk; Biome for
+    formatting is the fallback).
+  - Compared:
+    - **Biome** (2.5.15; the original lean): one tool, mature formatter,
+      React hooks + import rules stable, but `noFloatingPromises` /
+      `noMisusedPromises` are nursery and use Biome's own type inference,
+      no TanStack rules, Tailwind class sorting nursery.
+    - **ESLint + Prettier** (10.12 / typescript-eslint 8.71 / 3.9): full
+      type-checked rules, TanStack plugins, official react-hooks plugin,
+      mature Tailwind sorting, Forge's default; but two tools, ~6 packages,
+      slower.
+    - **Vite+** (`vite-plus` 1.1.0, MIT): bundles Vite, Vitest, oxlint,
+      oxfmt, Rolldown, tsdown, a task runner (`vp check` = fmt + lint +
+      types) and Node/package-manager management. Skipped for now: it wants
+      to be the entry point (`vp dev`/`vp build`) that Forge's Vite plugin
+      already is, its docs don't cover Electron or frameworks that drive
+      Vite, partial use is undocumented (risk of two Vites), and its Node
+      management overlaps `.nvmrc`. We use the same oxlint/oxfmt directly;
+      revisit later.
 - **Python tools stay** as discovery tools and as the reference for the TS
   port: local-only parity tests that the TS output is byte-identical to the
   Python output (like `tools/roundtrip.py`).
@@ -241,8 +277,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 ## Open
 
 - **Rest of the frontend stack** (proposed, not decided):
-  - Lint/format: Biome or ESLint + Prettier (Forge's template sets up
-    ESLint).
   - Package manager: npm or pnpm (pnpm + Forge needs
     `node-linker=hoisted`).
 - **After a login expires (30 days):** fall back to reading the same
