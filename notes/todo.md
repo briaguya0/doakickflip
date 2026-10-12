@@ -5,9 +5,19 @@
 commit at a time; decisions are in [architecture.md](architecture.md)
 ("App scaffold"). Done: template review, ZIP-only packaging, `app://`
 protocol + fuse, TS 7, type-aware lint, React + compiler, Tailwind,
-shadcn (Maia, Phosphor) + desktop-only sidebar, mount guard, TanStack
-Router (file-based, hash history). Next: TanStack Query, Vitest + RTL,
-commitlint; CSP (below); real pages instead of Page 1 / Page 2.
+shadcn (now Vega, Oxanium, Phosphor) + desktop-only inset sidebar, mount
+guard, TanStack Router (file-based, hash history), always-dark, page header
+with route titles, prototype colours via `theme.json`, Wayland colour
+workaround, sidebar header (skateboard mark). Next: TanStack Query (needs a
+real first use: a Status card row or Quick settings; no placeholder picked
+yet), Vitest + RTL, commitlint; CSP (below); real pages instead of Page 1 /
+Page 2; the prototype's gold filled active nav icon; maybe a named glow
+(`--drop-shadow-*`).
+
+**Credits for the skateboard icon** (CC BY 3.0 asks for visible credit and
+a note of changes: recoloured via `currentColor`). Only a file comment so
+far; add it to the Settings page's credits like the prototype's when we
+build Settings.
 
 **Next session (left 2026-10-11):** architecture is settled (see
 [architecture.md](architecture.md), "Open" has only one thing to check);

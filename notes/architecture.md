@@ -448,9 +448,10 @@ above:
   Vite's template calls the entry `main.tsx`; not used here to avoid
   confusion with Electron's `main.ts`. File casing: PascalCase for React
   components we write, kebab-case for shadcn's generated ones.
-- **shadcn/ui:** Base UI with the **Maia** style ("soft and rounded, with
-  generous spacing"; Nova, the CLI default, was tried first; Rhea and Luma
-  were also liked). `@/` → `src/frontend/` (tsconfig `paths` without
+- **shadcn/ui:** Base UI, now with the **Vega** style (was **Maia**, "soft
+  and rounded, with generous spacing"; Nova, the CLI default, was tried
+  first; Rhea and Luma were also liked; switched to Vega because the
+  prototype was less rounded, see "Style switch" below). `@/` → `src/frontend/` (tsconfig `paths` without
   `baseUrl`, which type-aware oxlint doesn't support; Vite alias via
   `import.meta.dirname`). shadcn's CLI only detects Vite via a
   `vite.config.*` file, so run it with a temporary
@@ -458,7 +459,8 @@ above:
   './vite.renderer.config';` and delete it after. Generated files get
   reformatted by oxfmt. The style lives in each component's classes, not
   in `index.css` (the CSS is the same for every style apart from the
-  font). Font: Figtree (from the Maia preset), bundled via fontsource.
+  font). Font: **Oxanium** (looks like the THPS fonts; was Figtree from the
+  Maia preset), bundled via fontsource.
   `shadcn` itself is a **devDependency** (only its `tailwind.css` is read
   at build time). Generated components import `cn` from the `cn` package
   directly.
@@ -494,14 +496,22 @@ above:
     removing the hook entirely.
   - `collapsible="icon"` (default `offcanvas` slides fully away); menu
     buttons have `tooltip`s for the collapsed rail.
-  - Header uses shadcn's block pattern (`sidebar-07`):
-    `SidebarMenuButton size="lg"` with a `size-8` logo tile + name, rendered
-    as a `div` (not a link). Without anything in that spot, collapsing
-    looked jumpy; shadcn shrinks buttons on collapse (lg `h-14`, default
-    `h-9` → `size-8`), which is fine once the header tile is there.
-  - Placeholder nav: "Page 1" / "Page 2" (not our real sections yet); logo
-    is a placeholder Phosphor icon. Our Twitch nav item, when it exists,
-    should use the official Twitch logo (brand rules), not Phosphor's.
+  - Header: first shadcn's block pattern (`sidebar-07`, a
+    `SidebarMenuButton size="lg"` rendered as a `div`), dropped because a
+    menu button keeps its hover/active/focus styles and felt clickable. Now
+    `AppSidebarHeader` (see "Sidebar header" below): a plain row in
+    `SidebarHeader` that copies the one thing the menu button did for us,
+    shrinking to `w-8` on collapse.
+  - `variant="inset"` (from `dashboard-01`): content sits in a rounded
+    panel (`SidebarInset` instead of a plain `<main>`) with a 1px `border`
+    in `--border`, standing in for the prototype's sidebar/content line.
+  - Active nav item: the prototype's gold left bar,
+    `data-active:shadow-[inset_3px_0_0_var(--sidebar-primary)]` on our
+    `SidebarMenuButton` (no edit to `ui/sidebar.tsx`). Not done yet: the
+    prototype's gold filled active icon.
+  - Placeholder nav: "Page 1" / "Page 2" (not our real sections yet). Our
+    Twitch nav item, when it exists, should use the official Twitch logo
+    (brand rules), not Phosphor's.
 - **Mount guard:** `index.html` has `<div id="app"></div>`;
   `src/frontend/index.tsx` gets it, throws if missing (no `!`), and only
   renders if it's empty (TanStack's quickstart guard against re-running the
@@ -533,6 +543,123 @@ above:
     `App.tsx`); pages `routes/index.tsx` (`/`), `routes/page-2.tsx`.
     Sidebar items: `SidebarMenuButton render={<Link to=… />}` with
     `isActive` from `useMatchRoute()`.
+- **Window title:** `🛹 Do a Kickflip!` in `index.html` (`<title>`).
+- **Always dark, no light mode ever:** `<html class="dark">` (Tailwind's
+  "toggling dark mode manually" setup with a fixed value; shadcn's
+  generated CSS ties `dark:` to the class via `@custom-variant`) plus
+  `nativeTheme.themeSource = 'dark'` in main (window frame, DevTools,
+  native controls, and what `prefers-color-scheme` reports).
+  `nativeTheme` alone isn't enough: the CSS doesn't use the media query.
+  No theme provider (shadcn's is for light/dark/system toggles). The light
+  block in `index.css` stays as shadcn writes it (it'd come back anyway).
+- **Page header** (`components/page-header.tsx`), adapted from shadcn's
+  `dashboard-01` `site-header.tsx` (file comment links the `bases/base`
+  copy at a pinned commit; the `new-york-v4`/`radix` copies add a GitHub
+  link button, part of their demo). Trigger, vertical separator, `<h1>`,
+  `border-b`; `h-12` instead of the block's `--header-height` variable.
+  - Rendered once in the root layout, outside `<Outlet />` (like the
+    trigger was), so pages can't forget it.
+  - **Title from route `staticData`**, required by declaration merging:
+    `StaticDataRouteOption { title: string | null }` (in `index.tsx`,
+    next to `Register`). A required key applies to *every* route,
+    including the root and any future layout routes, so the root says
+    `title: null`: null is intentional, undefined is not. (Considered: a
+    `PageHeader title=…` per page, which pages could forget; an optional
+    title; a test walking the route tree.)
+  - `hooks/use-title.ts`: deepest match with a title, using the
+    `[...matches].reverse().find(...)` pattern from TanStack's router
+    context guide. That guide uses route context with a `getTitle`
+    function (context can depend on params/loader data); `staticData` is
+    fixed per route, so a plain string. Move to context if a title ever
+    depends on data. `PageHeader` calls the hook itself (no props).
+- **`.tanstack/` is gitignored:** the router generator's temp dir for
+  atomic writes (`tmpDir`, default `.tanstack/tmp`); TanStack's starter
+  templates ignore it.
+- **Colours** (long detour; where it landed):
+  - shadcn themes are **literal `oklch` values** in `:root` / `.dark`,
+    each one a step copied from Tailwind's palette (e.g. dark `--primary`
+    in the amber theme = Tailwind's amber-800). No CLI option writes
+    `var(--color-…)` references (`--no-css-variables` bakes palette
+    classes into components instead); likely history (Tailwind v3 had no
+    palette CSS variables). We tried references for readability and went
+    back to literals: follow what shadcn expects.
+  - Components only use the semantic variables (no raw palette classes in
+    `ui/`; `shadcn/tailwind.css` only has `#000` in masks). No stock
+    component ships `cssVars`; the `--sidebar-*` variables came with
+    `init`, not with `add sidebar`.
+  - Presets: `baseColor` (greys: neutral, stone, zinc, mauve, olive, mist,
+    taupe) + `theme` (accent). `shadcn apply <code> --only theme` changes
+    only the colours (and `baseColor` in `components.json`).
+    `shadcn/preset` exports `encodePreset` / `decodePreset`, so codes can
+    be built locally. `gray` is in the CLI's list but the server rejects
+    it (400). Tried neutral, mist + amber/yellow, zinc + yellow; none felt
+    like the prototype (wrong hue: prototype greys are blue, ~258–264;
+    mist is blue-green, zinc violet). Radix's custom palette generator was
+    also looked at.
+  - **Overrides via a `registry:theme` item, `app/theme.json`**, applied
+    with `npx shadcn add ./theme.json` (temporary `vite.config.ts` as
+    usual). `cssVars.light` → `:root`, `.dark` → `.dark`, `.theme` →
+    `@theme inline` (no key for both modes, so we list `light` and `dark`
+    with the same values, to keep the override clear). A partial item only
+    overwrites the variables it lists. shadcn writes numbers without
+    trailing zeros, so `theme.json` uses that form too. Quirk: a `theme`
+    key starting with `color-` also gets a `--color-color-…` mapping.
+  - **Current theme: the prototype's colours** in `theme.json` (26
+    variables, `chart-*` left as shadcn's): `--bg` → `background`,
+    `--surface` → `card`/`popover`, `--surface-alt` → `secondary`/`muted`/
+    `accent`, `--text`, `--text-muted`, `--border`, `--border-strong` →
+    `input`, `--gold` → `primary`/`ring`, `--gold-ink` →
+    `primary-foreground`, `--caution` → `destructive`; `sidebar` = the
+    prototype sidebar gradient's midpoint (`#181a1e`).
+  - Re-run `npx shadcn add ./theme.json` after any `shadcn apply`.
+- **Chromium on Wayland lifts dark colours** (`#121417` rendered as
+  `#191b1d`; pure black and white unchanged; X11 and Firefox fine;
+  `--force-color-profile=srgb` doesn't help; HDR was off). Chromium's
+  Wayland colour manager decodes sRGB with the piecewise curve and
+  re-encodes for a gamma-2.2 output (Chromium issues 475549558,
+  477318785). This was why every preset looked off next to the prototype
+  in Firefox. Workaround in `main.ts`:
+  `app.commandLine.appendSwitch('disable-features', 'WaylandWpColorManagerV1')`
+  (verified by reading pixels over CDP; no effect on Windows). Same flag
+  works for Chromium itself when comparing pages.
+- **Style switch to Vega** (preset with `iconLibrary` swapped to
+  Phosphor via `encodePreset`): a full `shadcn apply` (the style can't be
+  applied with `--only`) reinstalls every `ui/*.tsx`, re-adds `sheet.tsx`
+  and `use-mobile.ts` (deleted again; desktop-only edits redone on Vega's
+  `sidebar.tsx`), resets the theme (re-add `theme.json`) and adds the new
+  font's import without removing the old one (fixed by hand; old font
+  package uninstalled). Font switched with `--only font`. Presets also
+  have a `fontHeading` (`--font-heading`, used by e.g. card/dialog titles;
+  ours is `inherit`). The preset fonts have Nunito Sans but not Nunito
+  (the prototype's).
+- **Sidebar header** (`components/app-sidebar-header.tsx`, renders shadcn's
+  `SidebarHeader`): the prototype's mark and text.
+  - `components/skateboard-icon.tsx`: "Skateboard" by Delapouite
+    (game-icons.net, CC BY 3.0, credit in a file comment), inline SVG with
+    `fill="currentColor"`, coloured with `text-sidebar-primary`, glow
+    `drop-shadow-[0_0_8px_color-mix(…var(--sidebar-primary)_35%…)]`.
+  - Two lines, "DO A" / "KICKFLIP" (gold, `tracking-[0.22em]`), then the
+    prototype's gold divider (`border-t-2 border-sidebar-primary/55`).
+    Oxanium's word space is narrow ("DOA"), hence
+    `[word-spacing:0.2em]`; the prototype's letter-spacing on "DO A" was
+    dropped.
+  - Clipping on collapse is on the text (`min-w-0 overflow-hidden`), not
+    the row, so the glow isn't cut off.
+  - **Vertical alignment:** `[text-box:trim-both_cap_alphabetic]` trims
+    the text box to the capitals and baseline, so centring lines up the
+    letters (Oxanium reserves a lot of space below the baseline, which
+    made the text look high), then `translate-y-0.5`: the prototype's text
+    sits a little below the board's centre (Nunito's metrics), and 2px
+    read best. Tailwind's `text-*` sizes carry their own line height
+    (`text-xs` = 16px), which broke the alignment until the trim made
+    outer line heights irrelevant; with it, the default sizes
+    (`text-base leading-none`, `text-xs`) work.
+  - Long class lists grouped by job with `cn()` (one string per concern),
+    as shadcn's components do. Idea not done: a named `--drop-shadow-*`
+    theme value for the glow.
+- **Viewing the renderer in a browser:** while `npm start` runs, Vite
+  serves it at `http://localhost:5173/` (listens on `[::1]`). Fine until
+  the renderer uses the preload bridge.
 - **Dev check gotcha:** the first `npm start` after adding packages
   pre-bundles them and reloads the page; probe after that settles.
 - Testing the window: below 768px used to trigger shadcn's mobile mode (the
@@ -553,6 +680,11 @@ above:
   page's WebSocket) to check the URL, rendered DOM, console warnings, and
   `fetch` results. Stop test processes by their full binary path (a
   `pkill -f` pattern that also matches the calling shell kills the shell).
+  For colour/alignment questions, `Page.captureScreenshot` (optionally with
+  `deviceScaleFactor: 2`) and read pixels; box positions and font-metric
+  arithmetic alone were misleading for the header text. The flatpak
+  Chromium can't write into the scratch dir and attaches to a running
+  instance, so headless screenshots need care.
 
 ## Open
 
