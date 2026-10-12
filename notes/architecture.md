@@ -241,7 +241,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 ## Open
 
 - **Rest of the frontend stack** (proposed, not decided):
-
   - Lint/format: Biome or ESLint + Prettier (Forge's template sets up
     ESLint).
   - Package manager: npm or pnpm (pnpm + Forge needs
