@@ -1,5 +1,8 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, protocol } from 'electron';
 import path from 'node:path';
+import { appScheme, handleAppProtocol } from './protocol';
+
+protocol.registerSchemesAsPrivileged([appScheme]);
 
 const createWindow = () => {
   // Create the browser window.
@@ -15,9 +18,7 @@ const createWindow = () => {
   if (FRONTEND_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(FRONTEND_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${FRONTEND_VITE_NAME}/index.html`),
-    );
+    mainWindow.loadURL(`app://${FRONTEND_VITE_NAME}/index.html`);
   }
 
   // Open the DevTools.
@@ -28,6 +29,7 @@ const createWindow = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  protocol.handle(appScheme.scheme, handleAppProtocol);
   createWindow();
 
   // On OS X it's common to re-create a window in the app when the
