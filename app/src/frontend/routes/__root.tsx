@@ -12,7 +12,7 @@ function RootLayout() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="border">
         <PageHeader />
         <div className="flex flex-col items-start gap-4 p-8">
           <Outlet />
