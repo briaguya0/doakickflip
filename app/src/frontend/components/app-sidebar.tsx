@@ -1,15 +1,14 @@
 import {
   NumberCircleOneIcon,
   NumberCircleTwoIcon,
-  StarFourIcon,
 } from '@phosphor-icons/react';
 import { Link, useMatchRoute } from '@tanstack/react-router';
+import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -25,16 +24,7 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" variant="inset">
-      <SidebarHeader>
-        <div className="flex h-12 items-center gap-2 overflow-hidden transition-[width] group-data-[collapsible=icon]:w-8">
-          <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg">
-            <StarFourIcon />
-          </div>
-          <span className="text-sm font-medium whitespace-nowrap">
-            Do a Kickflip
-          </span>
-        </div>
-      </SidebarHeader>
+      <AppSidebarHeader />
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
