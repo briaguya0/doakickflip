@@ -5,7 +5,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 export const Route = createRootRoute({
   component: RootLayout,
-  staticData: { title: null },
+  staticData: { title: null, icon: null },
 });
 
 function RootLayout() {

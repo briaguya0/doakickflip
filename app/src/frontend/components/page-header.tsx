@@ -1,7 +1,7 @@
 // adapted from https://github.com/shadcn-ui/ui/blob/b9f62a83999dc7df855738a8715f40ab156b1f10/apps/v4/registry/bases/base/blocks/dashboard-01/components/site-header.tsx
 import { AppSidebarTrigger } from '@/components/app-sidebar-trigger';
 import { Separator } from '@/components/ui/separator';
-import { useTitle } from '@/hooks/use-title';
+import { useTitle } from '@/hooks/use-static-data';
 
 export function PageHeader() {
   const title = useTitle();

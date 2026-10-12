@@ -3,6 +3,7 @@ import {
   createRouter,
   RouterProvider,
 } from '@tanstack/react-router';
+import type { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { routeTree } from './routeTree.gen';
 
@@ -14,6 +15,7 @@ declare module '@tanstack/react-router' {
   }
   interface StaticDataRouteOption {
     title: string | null;
+    icon: ReactElement | null;
   }
 }
 
