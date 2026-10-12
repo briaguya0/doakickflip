@@ -2,6 +2,9 @@ import { app, BrowserWindow, nativeTheme, protocol } from 'electron';
 import path from 'node:path';
 import { appScheme, handleAppProtocol } from './protocol';
 
+// https://issues.chromium.org/issues/475549558
+app.commandLine.appendSwitch('disable-features', 'WaylandWpColorManagerV1');
+
 protocol.registerSchemesAsPrivileged([appScheme]);
 
 const createWindow = () => {
