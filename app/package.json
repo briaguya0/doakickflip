@@ -1,9 +1,9 @@
 {
-  "name": "app",
-  "productName": "app",
+  "name": "doakickflip",
+  "productName": "doakickflip",
   "version": "1.0.0",
   "private": true,
-  "description": "My Electron application description",
+  "description": "🛹 Do a Kickflip!",
   "keywords": [],
   "license": "MIT",
   "author": {
