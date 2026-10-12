@@ -128,7 +128,7 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   - **Defaults:** `!doa` (viewer picks, Normal only) and `!kickflip` (one
     trick: Kickflip). No bits, no events, no channel point rewards.
   - **Edit card:** no subtitle lines; every row label left, control right,
-    same height and dividers. Rows: Type (Command / Redeem / Event, fields
+    same height and dividers. Rows: Type (**Chat** / Redeem / Event, fields
     follow it), Command, **Require bits** (toggle; on reveals **Bits
     required**), **Cooldown (global)** and **Cooldown (per user)** (seconds,
     "s" inside the box; per user blank = none). Then **Yells**:
@@ -151,6 +151,14 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
     - Delete is a red button at the bottom of the edit card.
   - **Trick picker** (not mocked yet): one type-to-search picker with combos
     shown, used by One trick's Change and by the allow/deny list's Edit.
+- **Chat trigger naming:** the type is **Chat** (not "Command": it names
+  the source like Redeem and Event do); its field is **Command** (`!doa`;
+  the familiar Twitch term, and it doesn't promise a position). Rejected
+  "Starts with": `Cheer100 !doa kickflip` must work. Matching: skip leading
+  cheer tokens (`Cheer100`, and Twitch's other cheermote names like
+  `Kappa100`), first word = the command, the rest = the message, with cheer
+  tokens stripped from it too (`!doa kickflip Cheer100`). Bits come as
+  their own field on the message (chat and EventSub), not parsed from text.
 - **What can be yelled, in layers:**
   1. **Possible:** what the skater can actually do (slotted tricks plus
      always-available ones). **No UI for managing it**: managing it by hand
@@ -255,8 +263,7 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   code, Open twitch.tv/activate, an expired code), **Connecting…**, and
   **login expired** (see [architecture.md](architecture.md)).
 - Finish reviewing **Settings** (Testing, Button prompts, Reset, Credits).
-- Naming of the chat trigger type: proposed **Chat** (type) / **Starts with**
-  (field) / **Require a cheer** + **Bits** (amount) instead of Command /
-  Command / Require bits + Bits required. Not decided.
+- Cheer row naming: keep **Require bits** / **Bits required**, or **Require
+  a cheer** / **Bits** (Twitch: you cheer, paid in bits)? Not decided.
 - Later: pick the real stack (not decided; avoid packaging that Defender
   likes to flag, e.g. PyInstaller-style bundles), then build it.
