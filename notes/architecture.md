@@ -82,6 +82,58 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
       into.
     - A [teamdev.com blog post](https://teamdev.com/mobrowser/blog/what-is-wrong-with-electron-ipc-and-how-to-fix-it/)
       on Electron IPC's problems: nothing we could use.
+- **Stored settings: our own small store, zod + `atomically`, no store
+  library and no database.**
+  - What's saved (in main, under `app.getPath('userData')`): settings (THUG
+    Pro folder, quick settings, testing, button prompts), triggers, Twitch
+    connection mode + channel (tokens separately via `safeStorage`), maybe
+    the session log and the inbox `seq`. Files like `settings.json`,
+    `triggers.json`, each with a `version` field for upgrade steps we write.
+  - Ours is: load → parse → zod check → defaults; save →
+    `atomically.writeFile`. A few dozen lines; no filesystem-level code of
+    our own.
+  - Options compared:
+    - **SQLite** (`better-sqlite3`): overkill for a few dozen settings and a
+      short trigger list; a native module complicates packaging.
+    - **Renderer `localStorage`**: main needs the data; renderer is the
+      untrusted side.
+    - **`electron-store`** (11.0.2, 2025; a thin wrapper over `conf`): nice
+      API (defaults, watch, dot paths, atomic writes via `atomically`), but
+      validates with JSON Schema/ajv (no zod hook), its **migrations carry
+      the author's "known bugs, no support" disclaimer**, it throws at
+      startup on a required field without a default, and `additionalProperties:
+      false` conflicts with migrations. Its "encryption" isn't for security.
+      It wouldn't help with the inbox either (it only manages its own
+      files).
+    - Schema setups considered to keep it fair (zod isn't sacred): A)
+      electron-store + ajv everywhere (types kept in sync by hand; verbose);
+      B) electron-store + TypeBox (`typebox` 1.x: one definition → TS type +
+      JSON Schema for ajv); C) electron-store + zod, feeding it
+      `z.toJSONSchema()` (zod v4 has it; refinements/transforms don't carry
+      over); D) our own store + zod + `atomically` (chosen; C was the runner-up).
+    - Also looked at: `electron-settings` (2024, lodash), `lowdb` (2023,
+      `steno` writes).
+- **Atomic writes: `atomically`** (2.1.1, 2026-02), for settings **and the
+  inbox**, over `write-file-atomic` (8.0.0, 2026-05, npm CLI team).
+  - Both: temp file next to the target → `fsync` → `rename`; queue writes
+    to the same file; remove the temp file on exit; keep owner/permissions
+    on POSIX.
+  - The deciding difference: **`atomically` retries** every step including
+    the rename (via `stubborn-fs`) on `EPERM`/`EBUSY`/`EACCES`/`EAGAIN`/
+    `EMFILE`/`ENFILE`, every 200 ms for up to 7.5 s (1 s sync); it also has
+    a retrying `readFile` and shortens over-long temp names.
+    **`write-file-atomic` doesn't retry** (its only `EPERM` handling is
+    ignoring a failed chown).
+  - Why it matters here: on Windows a rename over a file another process
+    has open fails with `EPERM`/`EACCES` (antivirus, indexers), and **THUG
+    Pro re-reads the inbox every few frames**, so un-retried inbox writes
+    would sometimes fail. (The Python `call_trick.py` uses plain
+    `os.replace`: same weakness on Windows; only run on Linux so far.)
+  - Trade-offs accepted: one maintainer (vs the npm team; ~21M vs ~102M
+    weekly downloads), ESM-only (fine with Forge 8). It's what electron-store
+    (via `conf`) already relies on.
+  - Plan: a shorter `timeout` (~1–2 s) for inbox writes, the default for
+    settings.
 - **Python tools stay** as discovery tools and as the reference for the TS
   port: local-only parity tests that the TS output is byte-identical to the
   Python output (like `tools/roundtrip.py`).
@@ -190,8 +242,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 - **Rest of the frontend stack** (proposed, not decided):
 
-  - Stored settings: our own JSON files in Electron's userData folder, zod +
-    atomic writes, rather than `electron-store`.
   - Lint/format: Biome or ESLint + Prettier (Forge's template sets up
     ESLint).
   - Package manager: npm or pnpm (pnpm + Forge needs
