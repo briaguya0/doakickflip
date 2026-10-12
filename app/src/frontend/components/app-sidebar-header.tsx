@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 export function AppSidebarHeader() {
   return (
-    <SidebarHeader>
+    <SidebarHeader className="h-header justify-between gap-0 pb-0">
       <div
         className={cn(
           'flex h-12 items-center gap-2.5',

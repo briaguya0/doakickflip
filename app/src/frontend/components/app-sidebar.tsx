@@ -25,7 +25,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" variant="inset">
       <AppSidebarHeader />
-      <SidebarContent>
+      <SidebarContent className="pt-2">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
