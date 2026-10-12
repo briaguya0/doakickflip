@@ -82,7 +82,9 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   - **Twitch connection icon:** filled plug everywhere (card, nav tab, Twitch
     page): `power_off` red = not connected (needs fixing), `power` blue =
     connecting, `power` green = connected. No grey "off by choice" state:
-    not connected is red however it happened. Considered link, sensors, chat bubbles, cloud, sync, wifi_tethering and generic. Sail just uses dots, and puts errors in a banner with the message: worth copying.
+    not connected is red however it happened. The Status row and sidebar show only
+    the icon, not which way you're connected (reading chat vs logged in):
+    that's on the Twitch page. Considered link, sensors, chat bubbles, cloud, sync, wifi_tethering and generic. Sail just uses dots, and puts errors in a banner with the message: worth copying.
   - **Red means "you need to fix this", not specifically "error"**, across
     the app: Settings' red `error` marker when THUG Pro isn't set up, the
     red unplugged Twitch icon when it's never been connected, the login
@@ -256,7 +258,5 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
 - Naming of the chat trigger type: proposed **Chat** (type) / **Starts with**
   (field) / **Require a cheer** + **Bits** (amount) instead of Command /
   Command / Require bits + Bits required. Not decided.
-- Dashboard Status row and the sidebar's Twitch marker: say which way you're
-  connected (reading chat vs logged in)? Not decided.
 - Later: pick the real stack (not decided; avoid packaging that Defender
   likes to flag, e.g. PyInstaller-style bundles), then build it.
