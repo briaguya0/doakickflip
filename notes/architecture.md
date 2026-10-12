@@ -308,6 +308,46 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   its zod schema. If it gets awkward (change tracking, conditional fields,
   async checks like "command already used"), add TanStack Form then (it
   takes zod schemas); react-hook-form is the other option.
+- **Packaging: ZIP only** (`@electron-forge/maker-zip`, any platform). No
+  installers: Squirrel (and `electron-squirrel-startup`) dropped, no bare
+  `.deb`/`.rpm` (we're not targeting distro repos; loose packages are bad).
+  macOS isn't a target (THUG Pro is Windows-only; Linux players use
+  Proton/Wine). Linux: Flatpak preferred later; AppImage (community
+  `@reforged/maker-appimage`) possible. electron-builder (portable `.exe`,
+  first-party AppImage, `electron-updater`) was considered and passed on:
+  staying on Forge.
+- **Electron fuses:** the template's six kept (`RunAsNode` off,
+  `EnableCookieEncryption` on, `EnableNodeOptionsEnvironmentVariable` off,
+  `EnableNodeCliInspectArguments` off, `EnableEmbeddedAsarIntegrityValidation`
+  on (macOS/Windows only), `OnlyLoadAppFromAsar` on), plus
+  **`GrantFileProtocolExtraPrivileges` off**. With `RunAsNode` off,
+  `child_process.fork` doesn't work: use `utilityProcess` if we ever need a
+  child process. Maybe later: `strictlyRequireAllFuses: true` so new fuses
+  in Electron upgrades need an explicit decision.
+- **Renderer served over `app://`, not `file://`.** Electron's security
+  checklist item 18 says to prefer a custom protocol (a `file://` page "has
+  unilateral access to every file", so XSS could read arbitrary files: our
+  page shows chat text and usernames), and its fuse docs say to disable
+  `GrantFileProtocolExtraPrivileges` when not serving from `file://`.
+  Forge's Vite docs only cover `file://` (`base: './'`, `loadFile`).
+  Verified: with the fuse off, `loadFile` gives a blank page (Chromium
+  won't run Vite's module script from `file://`); with `app://` it works.
+  Implementation follows the `protocol.handle` example in Electron's
+  protocol API docs (`registerSchemesAsPrivileged` with `standard`,
+  `secure`, `supportFetchAPI`; path-traversal check), except `path.join`
+  instead of the example's `path.resolve` (which treats the URL's leading
+  `/` as absolute and would reject every path). Dev still loads the Vite
+  dev server URL.
+- **Commits:** Angular-style conventional commits (`feat`, `fix`, `docs`,
+  `chore`, …), no scopes; `chore` for dependency/tooling changes (as
+  Renovate/Dependabot do). commitlint and semantic-release planned.
+- **Dependency ranges:** `^` + lockfile; `@electron-forge/*` on `~` (Forge's
+  Vite plugin: "Future minor releases may contain breaking changes").
+  `^` on 0.x packages (oxfmt) already means patch-only.
+- **Configs as `.ts`** with `"type": "module"` in `package.json` (oxlint
+  loads its config via Node; a `.ts` config in a CommonJS package warns).
+  Formatter: oxfmt with the template's settings (single quotes, width 80,
+  no `package.json` sorting); Tailwind class sorting to add with Tailwind.
 - **Node 24** (LTS), pinned in `.nvmrc`: run `nvm use` before any node/npm
   command.
 - **Package manager: npm** (with nvm for Node). pnpm considered: works fine
