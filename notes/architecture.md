@@ -224,6 +224,12 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
       Log in shows "waiting for approval" with the code and an Open
       twitch.tv/activate button, then "Logged in as …"; an expired code goes
       back to the button.
+    - **Always reconnects on launch** to whatever is saved; no setting.
+      Stop / Log out clears the saved connection (keep the channel name
+      filled in), so the next launch stays disconnected. A "don't reconnect"
+      setting would bring back an idle-but-saved state (not "needs fixing",
+      so not red) with its own UI; not worth it unless someone asks. Not
+      wanting effects in game = the Dashboard's Enabled toggle.
     - Opened again within 4h, or within 30 days: reconnects the way it was
       left, no clicks (a quiet refresh after 4h; each refresh restarts the
       30 days). Read chat never expires.
@@ -288,8 +294,6 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
 
 ## Open
 
-- **Reconnect on launch:** a setting, on by default? (Some streamers may not
-  want the app talking to Twitch the moment it opens.)
 - **Test fixtures for mod install.** Nothing from THUG2 or THUG Pro can be
   committed. Idea: a hand-written fake pause-menu script with the same shape
   as the hook point (`if GameModeEquals is_singlesession` … `endif`),
