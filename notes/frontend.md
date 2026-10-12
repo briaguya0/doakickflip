@@ -159,6 +159,9 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   `Kappa100`), first word = the command, the rest = the message, with cheer
   tokens stripped from it too (`!doa kickflip Cheer100`). Bits come as
   their own field on the message (chat and EventSub), not parsed from text.
+  Cheer rows: **Require bits** / **Bits required** (kept for the symmetry;
+  the number is in bits either way, streamers think in bits, Sail uses
+  "Require bits"). Considered "Require a cheer" / "Bits" and "Minimum bits".
 - **What can be yelled, in layers:**
   1. **Possible:** what the skater can actually do (slotted tricks plus
      always-available ones). **No UI for managing it**: managing it by hand
@@ -263,7 +266,5 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
   code, Open twitch.tv/activate, an expired code), **Connecting…**, and
   **login expired** (see [architecture.md](architecture.md)).
 - Finish reviewing **Settings** (Testing, Button prompts, Reset, Credits).
-- Cheer row naming: keep **Require bits** / **Bits required**, or **Require
-  a cheer** / **Bits** (Twitch: you cheer, paid in bits)? Not decided.
 - Later: pick the real stack (not decided; avoid packaging that Defender
   likes to flag, e.g. PyInstaller-style bundles), then build it.
