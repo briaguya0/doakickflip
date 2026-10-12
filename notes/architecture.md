@@ -19,7 +19,8 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
   - Forge: official Electron project, released 2026-09 (8.0.1), Vite 8,
     covers dev, packaging, installers ("makers") and publishing. Its Vite
     plugin is still labelled experimental (breaking changes possible in
-    minors): pin exact versions. Needs Node 22.12+, ESM-only.
+    minors): the `@electron-forge/*` packages use `~` (patch updates
+    only, kept in lockstep); everything else `^` + the lockfile. Needs Node 22.12+, ESM-only.
   - electron-vite: nicer dev loop (main/preload hot reload, one config, V8
     bytecode option) but only builds; packaging needs electron-builder too.
     Last stable 5.0.0 (2025-12), 6.0 in beta.
