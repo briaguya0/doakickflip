@@ -4,4 +4,5 @@ export default defineConfig({
   singleQuote: true,
   printWidth: 80,
   sortPackageJson: false,
+  sortTailwindcss: true,
 });
