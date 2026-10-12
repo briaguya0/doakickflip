@@ -43,6 +43,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     render={<Link to={item.to} />}
+                    className="data-active:shadow-[inset_3px_0_0_var(--sidebar-primary)]"
                     isActive={!!matchRoute({ to: item.to })}
                     tooltip={item.title}
                   >
