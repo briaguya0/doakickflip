@@ -6,7 +6,9 @@ committed; run `tools/extract.py` to regenerate `extracted/` locally and follow
 along.
 
 Versions this was worked out against: THUG Pro beta 0.7.0.0 (shown in the
-launcher; `changelog.txt`'s newest entry is 0.6.0.11, so don't go by it) on a
+launcher; released 2023-10-19 per https://thugpro.com/changelog/). The bundled
+`changelog.txt` stopped being updated at 0.6.0.11 (the site lists .12–.19
+after it), so don't go by it. On a
 retail PC THUG2 install.
 
 - [todo.md](todo.md): what's next and open questions
