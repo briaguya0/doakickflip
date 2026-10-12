@@ -81,7 +81,8 @@ Screenshots without a person: headless Chromium (Flatpak) works, e.g.
     (one-way: the app can't know it).
   - **Twitch connection icon:** filled plug everywhere (card, nav tab, Twitch
     page): `power_off` grey = not connected, `power` blue = connecting,
-    `power` green = connected, `power_off` red = error. Considered link,
+    `power` green = connected, `power_off` red = error / needs addressing
+    (e.g. the Twitch login expired). Considered link,
     sensors, chat bubbles, cloud, sync, wifi_tethering and generic. Sail just
     uses dots, and puts errors in a banner with the message: worth copying.
   - **Session log** table: time, type (chat / test / sim only), user (Twitch
