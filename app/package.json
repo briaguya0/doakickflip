@@ -11,6 +11,7 @@
     "email": "70942617+briaguya0@users.noreply.github.com"
   },
   "main": ".vite/build/main.cjs",
+  "type": "module",
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
