@@ -12,11 +12,11 @@ workaround, sidebar header (skateboard mark). Next: TanStack Query (needs a
 real first use: a Status card row or Quick settings; no placeholder picked
 yet), Vitest + RTL, commitlint; CSP (below); real pages instead of Page 1 /
 Page 2; the prototype's gold filled active nav icon; maybe a named glow
-(`--drop-shadow-*`); nav status icons (plan in architecture.md, "Nav status
-icons").
+(`--drop-shadow-*`); sidebar tab status icons (see architecture.md, "Sidebar
+tab status icons").
 
 **Idea: status text on hover when the sidebar is expanded.** Collapsed, the
-nav tooltip says "Twitch · Not connected"; expanded, hovering the status
+tab tooltip says "Twitch · Not connected"; expanded, hovering the status
 icon shows nothing. Two ways: a `Tooltip` on the icon (shadcn's
 `SidebarMenuBadge` is `pointer-events-none` so clicks reach the link; giving
 the icon hover means clicking it wouldn't navigate), or the menu button's

@@ -272,7 +272,7 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
       30 days). Read chat never expires.
     - After 30 days unused (logged in): the refresh fails; nothing
       connects. The sidebar's Twitch marker and the Dashboard Status row go
-      **red** (the "needs addressing" state; see "Nav status icons"); the Twitch page
+      **red** (the "needs addressing" state; see "Sidebar tab status icons"); the Twitch page
       shows the two options again with the login-expired message. **No
       fallback** to reading chat: it would add a "reading because the login
       expired" state and hide that redeems don't work (viewers spending
@@ -657,8 +657,8 @@ above:
   - Long class lists grouped by job with `cn()` (one string per concern),
     as shadcn's components do. Idea not done: a named `--drop-shadow-*`
     theme value for the glow.
-- **Nav status icons** (in progress on `app-scaffold`): a marker on a nav item
-  for state that needs attention, replacing the prototype's Material
+- **Sidebar tab status icons** (`app-scaffold`, with faked statuses): a marker on a sidebar
+  tab for state that needs attention, replacing the prototype's Material
   `power` / `power_off` / `error` glyphs.
   - Three statuses: `ok` (green), `pending` (blue), `problem` (red), the
     prototype's `--tip` `#3fb950`, `--note` `#4493f8`, `--caution`
@@ -671,32 +671,37 @@ above:
     Settings only when something in Settings has a problem (a generic
     "Needs attention", not tied to game setup; e.g. folder not found, mod
     not installed, inbox not writable).
-  - Expanded sidebar: the icon at the end of the item (as in the
+  - Expanded sidebar: the icon at the end of the tab (as in the
     prototype), in shadcn's `SidebarMenuBadge` (its slot for trailing
     content; absolute, click-through, hidden when collapsed), sized
     `[&_svg]:size-4` like the menu button's icons (the badge is `text-xs`,
     and Phosphor icons are `1em`).
-  - Collapsed sidebar: **an 8px red dot on the nav icon's top-right corner,
+  - Collapsed sidebar: **an 8px red dot on the tab icon's top-right corner,
     for `problem` only**; `ok` and `pending` show nothing (the compact rail
     only flags what needs fixing). The dot has a 2px ring in the colour
-    behind it (`--sidebar`, or the active item's background), so it stays
-    clear inside the active item's gold outline. The tooltip carries the
+    behind it (`--sidebar`, or the active tab's background), so it stays
+    clear inside the active tab's gold outline. The tooltip carries the
     words: "Twitch · Not connected".
   - Code shape:
     - `hooks/use-status.ts`: `Status` / `StatusInfo` (`{ status, label }`)
-      and the reusable `useTwitchConnectionStatus()` /
-      `useSettingsStatus()`, each a `useQuery` (Query dedupes by key, so
-      every caller shares one entry) that maps the raw value to a
-      `StatusInfo`, `null` while loading. The fetchers are fakes until main
-      reports the real state over IPC. Not route-aware, so the dashboard
-      can use them too.
+      and the reusable `useTwitchStatus()` / `useSettingsStatus()`, each a
+      `useQuery` (keys `twitch-status`, `settings-status`; Query dedupes
+      by key, so every caller shares one entry), `null` while loading. The
+      queries use `fetchFakeTwitchStatus` / `fetchFakeSettingsStatus`,
+      which return a `StatusInfo` directly; the mapping from real state
+      (e.g. a connection state) to a status comes with the IPC. Not
+      route-aware, so the dashboard can use them too.
     - `hooks/use-route-status.ts`: `useRouteStatus(to)` calls both
       unconditionally (rules of hooks) and picks by route.
     - `components/status-icon.tsx`: `StatusIcon` takes a `StatusInfo`; the
       icon and colour follow from the status.
     - In the sidebar, `NavItem` lists `ActiveIndicator`, `NavIcon`
-      (`statusIsProblem` → `ProblemDot` when collapsed) and `NavStatus`
-      (the badge).
+      (`statusIsProblem` → `ProblemDot`) and `NavStatus` (the badge).
+      `ProblemDot` stays mounted while there's a problem and reads the
+      collapsed state itself: it fades in over the slide's 200ms linear
+      when collapsing (the transition classes sit only on the collapsed
+      side) and disappears at once when expanding (a fade-out felt
+      strange).
     - Dropped: the first idea, `staticData.statusIcon` (a component per
       route reading its own state). `NavItem` needs the status itself for
       the tooltip, and a hook stored in `staticData` is a hook passed as a
