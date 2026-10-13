@@ -50,7 +50,7 @@ function NavItem({ to }: { to: (typeof nav)[number] }) {
       >
         <ActiveIndicator isActive={isActive} />
         {icon}
-        <span>{title}</span>
+        <span className="translate-y-px">{title}</span>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );
