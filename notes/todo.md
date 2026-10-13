@@ -12,7 +12,8 @@ workaround, sidebar header (skateboard mark). Next: TanStack Query (needs a
 real first use: a Status card row or Quick settings; no placeholder picked
 yet), Vitest + RTL, commitlint; CSP (below); real pages instead of Page 1 /
 Page 2; the prototype's gold filled active nav icon; maybe a named glow
-(`--drop-shadow-*`).
+(`--drop-shadow-*`); nav status icons (plan in architecture.md, "Nav status
+icons").
 
 **Credits for the skateboard icon** (CC BY 3.0 asks for visible credit and
 a note of changes: recoloured via `currentColor`). Only a file comment so

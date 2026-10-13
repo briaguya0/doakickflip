@@ -272,7 +272,7 @@ Aim: more conventional than [Sail](https://github.com/HarbourMasters/Sail)
       30 days). Read chat never expires.
     - After 30 days unused (logged in): the refresh fails; nothing
       connects. The sidebar's Twitch marker and the Dashboard Status row go
-      **red** (`power_off`, the "needs addressing" state); the Twitch page
+      **red** (the "needs addressing" state; see "Nav status icons"); the Twitch page
       shows the two options again with the login-expired message. **No
       fallback** to reading chat: it would add a "reading because the login
       expired" state and hide that redeems don't work (viewers spending
@@ -657,6 +657,40 @@ above:
   - Long class lists grouped by job with `cn()` (one string per concern),
     as shadcn's components do. Idea not done: a named `--drop-shadow-*`
     theme value for the glow.
+- **Nav status icons (planned, not built yet):** a marker on a nav item
+  for state that needs attention, replacing the prototype's Material
+  `power` / `power_off` / `error` glyphs.
+  - Three statuses: `ok` (green), `pending` (blue), `problem` (red), the
+    prototype's `--tip` `#3fb950`, `--note` `#4493f8`, `--caution`
+    `#f85149`.
+  - Icons, Phosphor **fill**, one per status, the same on every item:
+    `warning-circle` (problem), `spinner-gap` (pending), `check-circle`
+    (ok). The same warning icon on Twitch and Settings, and a filled red
+    circle reads like the collapsed dot below.
+  - Twitch always shows one (not connected / connecting / connected);
+    Settings only when the game setup has a problem (folder not found, mod
+    not installed, inbox not writable).
+  - Expanded sidebar: the icon at the end of the item (as in the
+    prototype).
+  - Collapsed sidebar: **an 8px red dot on the nav icon's top-right corner,
+    for `problem` only**; `ok` and `pending` show nothing (the compact rail
+    only flags what needs fixing). The dot has a 2px ring in the colour
+    behind it (`--sidebar`, or the active item's background), so it stays
+    clear inside the active item's gold outline. The tooltip carries the
+    words: "Twitch · Not connected".
+  - Code shape (from earlier discussion): route `staticData.statusIcon:
+    ComponentType | null`; `TwitchConnectionStatusIcon` and
+    `SetupStatusIcon` each read their own state with hooks and render a
+    shared `StatusIcon` primitive (status + label; the icon now follows
+    from the status).
+  - Compared with a mock-up of every option: a dot for every status, the
+    status glyph shrunk into the corner (about 11px, unreadable; the
+    warning covered the gear), problems only, and no marker
+    (tooltip only; a broken connection would be invisible until hover).
+    Icon families looked at: Phosphor's plugs (disconnected one disliked),
+    link (liked; regular weight only, the fill versions are boxed), Wi-Fi,
+    cell signal, globe, cloud, generic `x-circle` / `circle-notch` /
+    `check-circle`; `circle-notch` fill reads as a target.
 - **Viewing the renderer in a browser:** while `npm start` runs, Vite
   serves it at `http://localhost:5173/` (listens on `[::1]`). Fine until
   the renderer uses the preload bridge.
