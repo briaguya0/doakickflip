@@ -15,6 +15,15 @@ Page 2; the prototype's gold filled active nav icon; maybe a named glow
 (`--drop-shadow-*`); nav status icons (plan in architecture.md, "Nav status
 icons").
 
+**Idea: status text on hover when the sidebar is expanded.** Collapsed, the
+nav tooltip says "Twitch · Not connected"; expanded, hovering the status
+icon shows nothing. Two ways: a `Tooltip` on the icon (shadcn's
+`SidebarMenuBadge` is `pointer-events-none` so clicks reach the link; giving
+the icon hover means clicking it wouldn't navigate), or the menu button's
+own tooltip shown expanded too (it spreads our props after `hidden`, so
+`hidden: false` works; pops out beside the icon but shows on hovering
+anywhere on the item).
+
 **Credits for the skateboard icon** (CC BY 3.0 asks for visible credit and
 a note of changes: recoloured via `currentColor`). Only a file comment so
 far; add it to the Settings page's credits like the prototype's when we

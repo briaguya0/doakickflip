@@ -657,7 +657,7 @@ above:
   - Long class lists grouped by job with `cn()` (one string per concern),
     as shadcn's components do. Idea not done: a named `--drop-shadow-*`
     theme value for the glow.
-- **Nav status icons (planned, not built yet):** a marker on a nav item
+- **Nav status icons** (in progress on `app-scaffold`): a marker on a nav item
   for state that needs attention, replacing the prototype's Material
   `power` / `power_off` / `error` glyphs.
   - Three statuses: `ok` (green), `pending` (blue), `problem` (red), the
@@ -668,21 +668,39 @@ above:
     (ok). The same warning icon on Twitch and Settings, and a filled red
     circle reads like the collapsed dot below.
   - Twitch always shows one (not connected / connecting / connected);
-    Settings only when the game setup has a problem (folder not found, mod
+    Settings only when something in Settings has a problem (a generic
+    "Needs attention", not tied to game setup; e.g. folder not found, mod
     not installed, inbox not writable).
   - Expanded sidebar: the icon at the end of the item (as in the
-    prototype).
+    prototype), in shadcn's `SidebarMenuBadge` (its slot for trailing
+    content; absolute, click-through, hidden when collapsed), sized
+    `[&_svg]:size-4` like the menu button's icons (the badge is `text-xs`,
+    and Phosphor icons are `1em`).
   - Collapsed sidebar: **an 8px red dot on the nav icon's top-right corner,
     for `problem` only**; `ok` and `pending` show nothing (the compact rail
     only flags what needs fixing). The dot has a 2px ring in the colour
     behind it (`--sidebar`, or the active item's background), so it stays
     clear inside the active item's gold outline. The tooltip carries the
     words: "Twitch · Not connected".
-  - Code shape (from earlier discussion): route `staticData.statusIcon:
-    ComponentType | null`; `TwitchConnectionStatusIcon` and
-    `SetupStatusIcon` each read their own state with hooks and render a
-    shared `StatusIcon` primitive (status + label; the icon now follows
-    from the status).
+  - Code shape:
+    - `hooks/use-status.ts`: `Status` / `StatusInfo` (`{ status, label }`)
+      and the reusable `useTwitchConnectionStatus()` /
+      `useSettingsStatus()`, each a `useQuery` (Query dedupes by key, so
+      every caller shares one entry) that maps the raw value to a
+      `StatusInfo`, `null` while loading. The fetchers are fakes until main
+      reports the real state over IPC. Not route-aware, so the dashboard
+      can use them too.
+    - `hooks/use-route-status.ts`: `useRouteStatus(to)` calls both
+      unconditionally (rules of hooks) and picks by route.
+    - `components/status-icon.tsx`: `StatusIcon` takes a `StatusInfo`; the
+      icon and colour follow from the status.
+    - In the sidebar, `NavItem` lists `ActiveIndicator`, `NavIcon`
+      (`statusIsProblem` → `ProblemDot` when collapsed) and `NavStatus`
+      (the badge).
+    - Dropped: the first idea, `staticData.statusIcon` (a component per
+      route reading its own state). `NavItem` needs the status itself for
+      the tooltip, and a hook stored in `staticData` is a hook passed as a
+      value, which React's rules and the compiler lint reject.
   - Compared with a mock-up of every option: a dot for every status, the
     status glyph shrunk into the corner (about 11px, unreadable; the
     warning covered the gear), problems only, and no marker
