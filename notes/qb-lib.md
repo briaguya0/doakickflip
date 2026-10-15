@@ -10,6 +10,9 @@ be a **separate library in its own repo**, not code inside doakickflip:
 - To work on both at once, doakickflip's app gets a **gitignored npm
   workspace dir**, `app/packages/`, that a local checkout of the library can
   drop into. No turbo: one library and one app don't need it.
+- The checkout in `packages/` is a **worktree (or clone), not a symlink**:
+  Node resolves a symlink to its real path, so the library would resolve its
+  imports from its own `node_modules` instead of the app's.
 
 ## Prior art: openedx
 
@@ -18,11 +21,6 @@ developing against [frontend-base](https://github.com/openedx/frontend-base):
 
 - The app's `package.json` has `"workspaces": ["packages/*"]`, and
   `.gitignore` has `packages/`, so nothing of the library is committed.
-- The README bind-mounts the library checkout into `packages/frontend-base`
-  (`sudo mount --bind`), because "Node resolves symlinks to their real
-  paths" (a symlinked library would resolve its imports from its own
-  `node_modules`, e.g. a second React). Cloning straight into `packages/`
-  works too.
 - `npm install` then links the local copy. The library's dev version is
   `0.0.0-dev`, and the app's range allows it (`"^2.0.0-alpha || 0.0.0-dev"`).
 - turbo (`turbo.site.json`, driven from the `Makefile`) builds the packages
@@ -48,8 +46,8 @@ committed or published.
   the library's sibling checkout works. `npm install` replaces
   `node_modules/qb-spike` with a symlink to `packages/qb-spike` (it wins
   over the `file:` tarball dependency), and dev and packaged builds both use
-  it. The symlink stays inside the app dir, so the realpath problem above
-  doesn't come up. `git worktree remove` cleans up. A branch can only be
+  it. npm's own symlink points inside the app dir, so imports still resolve
+  through the app's `node_modules`. `git worktree remove` cleans up. A branch can only be
   checked out in one worktree, so the sibling checkout and the one in
   `packages/` need different branches (or one detached).
 - **Lockfile:** while `packages/` has a checkout, `npm install` rewrites the
