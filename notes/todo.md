@@ -24,6 +24,11 @@ own tooltip shown expanded too (it spreads our props after `hidden`, so
 `hidden: false` works; pops out beside the icon but shows on hovering
 anywhere on the item).
 
+**QB / PRX library:** the mod side becomes its own repo and package,
+consumed by doakickflip (vendored tarball until published, gitignored
+`app/packages/` workspace for working on both). Plan and spike findings in
+[qb-lib.md](qb-lib.md).
+
 **Credits for the skateboard icon** (CC BY 3.0 asks for visible credit and
 a note of changes: recoloured via `currentColor`). Only a file comment so
 far; add it to the Settings page's credits like the prototype's when we
