@@ -42,14 +42,13 @@ committed or published.
   `node_modules`: the plugin sets `packagerConfig.ignore` to everything not
   under `/.vite` (`VitePlugin.js`).
 - **Worktree in `packages/`:** with `"workspaces": ["packages/*"]` and
-  `packages/` gitignored, a `git worktree add <app>/packages/qb-spike` from
-  the library's sibling checkout works. `npm install` replaces
-  `node_modules/qb-spike` with a symlink to `packages/qb-spike` (it wins
-  over the `file:` tarball dependency), and dev and packaged builds both use
-  it. npm's own symlink points inside the app dir, so imports still resolve
-  through the app's `node_modules`. `git worktree remove` cleans up. A branch can only be
-  checked out in one worktree, so the sibling checkout and the one in
-  `packages/` need different branches (or one detached).
+  `packages/` gitignored, `git worktree add <app>/packages/qb-spike` from
+  the library's sibling checkout, then a plain `npm install` in the app:
+  the app now uses the checkout instead of the vendored tarball, in dev and
+  packaged builds. `package.json` is untouched (still the `file:` tarball).
+  `git worktree remove` + `npm install` goes back to the tarball. A branch
+  can only be checked out in one worktree, so the sibling checkout and the
+  one in `packages/` need different branches (or one detached).
 - **Lockfile:** while `packages/` has a checkout, `npm install` rewrites the
   lock entry to a link (`"resolved": "packages/qb-spike", "link": true`).
   With `packages/` empty, `npm install` goes back to the tarball; the only
