@@ -18,7 +18,7 @@ retail PC THUG2 install.
 - [qb-gotchas.md](qb-gotchas.md): QB scripting pitfalls
 - [running.md](running.md): launching, logging, finding crashes
 - [formats.md](formats.md): PRE/PRX archives, QB keys, QB bytecode
-- [qb-lib.md](qb-lib.md): the QB/PRX library as its own repo, and how doakickflip develops against it
+- [qb-lib.md](qb-lib.md): nsqb, the NeverScript ↔ QB library: direction, prior art, how doakickflip develops against it
 - [scripts.md](scripts.md): where things live in the game's scripts
 - [skate-tricks-goal.md](skate-tricks-goal.md): the stock Skate-Tricks goal and its engine internals
 - [thugpro-versions.md](thugpro-versions.md): installer, updater manifests (CRC32 per file), reading the version from `thugpro.dll`

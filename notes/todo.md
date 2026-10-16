@@ -24,9 +24,10 @@ own tooltip shown expanded too (it spreads our props after `hidden`, so
 `hidden: false` works; pops out beside the icon but shows on hovering
 anywhere on the item).
 
-**QB / PRX library:** the mod side becomes its own repo and package,
-consumed by doakickflip (vendored tarball until published, gitignored
-`app/packages/` workspace for working on both). Plan and spike findings in
+**nsqb (NeverScript ↔ QB library):** the script side of the mod becomes
+its own repo and package, consumed by doakickflip (vendored tarball until
+published, gitignored `app/packages/` workspace for working on both). PRX /
+LZSS stay out. Direction, prior art and spike findings in
 [qb-lib.md](qb-lib.md).
 
 **Credits for the skateboard icon** (CC BY 3.0 asks for visible credit and
