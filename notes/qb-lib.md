@@ -36,6 +36,34 @@ name **`nsqb`** (NeverScript ↔ QB; free on npm as of 2026-10-16).
   ([formats.md](formats.md)). Other projects are references for checking
   understanding, not code to copy.
 
+## Playground
+
+A small web app in the nsqb repo, `playground/`, so cloning and running
+`npm start` gives something to play with, using the library from source (no
+build step).
+
+- **Stack:** React + Vite (same as doakickflip). Editing and compiling need
+  real UI state, so a lighter setup wouldn't help.
+- **Features, in order:** open `.qb` files (picker / drag and drop) and
+  decompile to `.ns` in the browser (files never leave it); load key
+  dictionaries and harvest names from the name tables of opened files, show
+  unresolved checksums; later edit, compile back to `.qb`, download, and a
+  round-trip byte check.
+- **First run without game files:** a hand-written `.ns` sample (our own) to
+  compile and decompile, since the repo can't ship `.qb` files.
+- **Highlighting:** our own NeverScript TextMate grammar (none exists),
+  loaded into Shiki as a custom language. Start with a Shiki read-only view;
+  add Monaco via `@shikijs/monaco` (same grammar) once compiling exists.
+  `@monaco-editor/react` loads Monaco from a CDN by default; point it at the
+  local `monaco-editor` instead.
+- **The grammar lives in the playground.** It's editor tooling, not compiler
+  logic; packaging it separately only if something else ever needs it,
+  likely long after nsqb is published.
+- **Not hosted:** a Pages link would end up being read as the docs, and
+  people would skip the README.
+- Some revert-mods `.ns` files are named after game scripts (e.g.
+  `gamemenu_pause.ns`); reference only, not fixtures.
+
 ## Prior art: QB / QScript
 
 No official spec exists. Neversoft called the language **QScript** (`.q`
