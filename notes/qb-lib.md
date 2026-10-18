@@ -24,8 +24,8 @@ name **`nsqb`** (NeverScript ↔ QB; free on npm as of 2026-10-16).
   THUG2-based), and it's what Revert's MIT-licensed tooling and mods use, so
   `nsqb` stays compatible with an existing ecosystem. `mod/doakickflip.q`
   would move to `.ns`.
-- **Scope: `.ns` ↔ `.qb` and QB keys only.** PRX archives and LZSS stay out
-  (there's likely existing tooling for those; see below).
+- **Scope: `.ns` ↔ `.qb` and QB keys only.** PRX archives and LZSS stay
+  out (see "PRX / LZSS" below).
 - **QB keys:** every name in bytecode is `crc32(name.lower()) ^ 0xFFFFFFFF`
   (see [formats.md](formats.md)); each `.qb` ends with a checksum → name
   table, which THUG Pro strips. `nsqb` computes keys, reads/writes name
@@ -104,8 +104,26 @@ informal "test wiki", unlinked from the rest of the site).
 - Licence pattern: the older tools have no licence; the licensed ones are
   recent, and a fork's licence can't cover code carried over from an
   unlicensed upstream.
-- PRX / LZSS (out of `nsqb`'s scope): neversoft-multitool, thugkit's PRE
-  codec, PreTool / PRXReaper. npm not checked yet.
+
+## PRX / LZSS
+
+Not in `nsqb`. Nothing on npm (searched "neversoft", "thug2", "tony hawk",
+"qbkey", "prx archive"; the LZSS packages are other variants, and
+Neversoft's has specific parameters, see [formats.md](formats.md)).
+
+- **Plan: adapt [BryanRykowski/nspre](https://github.com/bryanrykowski/nspre)
+  to TS** (C++, MIT, single header `nspre.hpp`: `Reader` / `Subfile`,
+  extract with decompression, writing; example `ns-pack` / `ns-unpack`).
+  Comments reference the C++ being translated, linked at a pinned commit
+  (`34c0658503d9f1a613738d7565bbe4ed6b9782ee`, 2025-04-14) so line refs don't
+  drift. MIT needs nspre's notice ("Copyright (c) 2025 Bryan Rykowski" +
+  permission text) kept with the port. Where it lives (inside doakickflip,
+  or its own package) is undecided; `nspre` is free on npm but is the C++
+  library's name.
+- Other references: Revert's thugkit PRE codec (Go, MIT, byte-identical
+  round trip), neversoft-multitool (C#, reads PRE/PRE3/PRX), NeverScript's
+  PRE/PRX generator (Go, no licence), nodeqbc's `LZSS.js` (no licence),
+  PreTool / PRXReaper (Windows GUIs), our `prx.py`.
 
 **To check before committing to NeverScript:** whether its grammar covers
 everything THUG2 scripts use (`switch`, `elseif`, `Random*`); whether
