@@ -117,9 +117,12 @@ Neversoft's has specific parameters, see [formats.md](formats.md)).
   Comments reference the C++ being translated, linked at a pinned commit
   (`34c0658503d9f1a613738d7565bbe4ed6b9782ee`, 2025-04-14) so line refs don't
   drift. MIT needs nspre's notice ("Copyright (c) 2025 Bryan Rykowski" +
-  permission text) kept with the port. Where it lives (inside doakickflip,
-  or its own package) is undecided; `nspre` is free on npm but is the C++
-  library's name.
+  permission text) kept with the port.
+- **Its own repo and package, same pattern as nsqb:** doakickflip vendors an
+  `npm pack` tarball (`file:vendor/…tgz`) until it's published, and a
+  checkout goes in the gitignored `app/packages/` (worktree or clone) to
+  work on both. No playground. Name undecided (`nspre` is free on npm but is
+  the C++ library's name; `nsprx` pairs with `nsqb` without reusing it).
 - Other references: Revert's thugkit PRE codec (Go, MIT, byte-identical
   round trip), neversoft-multitool (C#, reads PRE/PRE3/PRX), NeverScript's
   PRE/PRX generator (Go, no licence), nodeqbc's `LZSS.js` (no licence),
