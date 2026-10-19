@@ -121,8 +121,12 @@ Neversoft's has specific parameters, see [formats.md](formats.md)).
 - **Its own repo and package, same pattern as nsqb:** doakickflip vendors an
   `npm pack` tarball (`file:vendor/…tgz`) until it's published, and a
   checkout goes in the gitignored `app/packages/` (worktree or clone) to
-  work on both. No playground. Name undecided (`nspre` is free on npm but is
-  the C++ library's name; `nsprx` pairs with `nsqb` without reusing it).
+  work on both. No playground.
+- **Name: `prxhawk`** (free on npm and GitHub, 2026-10-18). Keeps `prx`
+  (the extension modders see, not `pre`), implies both reading and writing,
+  and nods at the series without naming the studio (reads like Neversoft
+  made it) or `thps` (direct, and wrong for THUG2). `ns`-prefixed names were
+  out: in `nsqb`, `ns` means NeverScript, not Neversoft.
 - Other references: Revert's thugkit PRE codec (Go, MIT, byte-identical
   round trip), neversoft-multitool (C#, reads PRE/PRE3/PRX), NeverScript's
   PRE/PRX generator (Go, no licence), nodeqbc's `LZSS.js` (no licence),
