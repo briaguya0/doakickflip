@@ -59,8 +59,8 @@ build step).
 - **The grammar lives in the playground.** It's editor tooling, not compiler
   logic; packaging it separately only if something else ever needs it,
   likely long after nsqb is published.
-- **Not hosted:** a Pages link would end up being read as the docs, and
-  people would skip the README.
+- **Not hosted for the first release:** a Pages link would end up being
+  read as the docs, and people would skip the README. Not ruled out later.
 - Some revert-mods `.ns` files are named after game scripts (e.g.
   `gamemenu_pause.ns`); reference only, not fixtures.
 
