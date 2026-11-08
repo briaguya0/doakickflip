@@ -11,6 +11,7 @@ launcher; released 2023-10-19 per https://thugpro.com/changelog/). The bundled
 after it), so don't go by it. On a
 retail PC THUG2 install.
 
+- [../wayfinder/v1/map.md](../wayfinder/v1/map.md): the v1 map: destination, scope, decision tickets (wayfinder)
 - [todo.md](todo.md): what's next and open questions
 - [frontend.md](frontend.md): the app's UI: where the prototype is, decisions, next steps
 - [architecture.md](architecture.md): how the real app gets built: stack, testing, what's decided and open
