@@ -2,6 +2,7 @@
 
 Type: research
 Status: open
+See: nsqb's wayfinder/v1 ticket 02 asks the same question; resolve there and link the answer here.
 
 ## Question
 
