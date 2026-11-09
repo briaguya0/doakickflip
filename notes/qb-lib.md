@@ -72,7 +72,8 @@ source, `.qb` "q binary", compiler `qcomp`), per
 informal "test wiki", unlinked from the rest of the site).
 
 - [byxor/NeverScript](https://github.com/byxor/NeverScript) (Go, 2023):
-  NeverScript → QB compiler, PRE/PRX generator; decompiler not implemented.
+  NeverScript → QB compiler, PRE/PRX generator; partial decompiler (`ns -d`) despite the README saying
+  it isn't implemented.
   `compiler/tokens.go`, `docs/neverscript-syntax.ns`. No licence; the README
   says "Feel free to fork the repo and make as many changes/improvements as
   you like. There's no license, you don't owe me a thing." We won't use Go

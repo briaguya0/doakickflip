@@ -41,6 +41,9 @@ branch.
 
 ## Decisions so far
 
+- [Does NeverScript's grammar cover everything THUG2 scripts use?](issues/01-neverscript-grammar-coverage.md): answered in nsqb's map; Revert's fork nearly, upstream no
+- [Which repo is Revert's NeverScript fork, what's its licence, and does it decompile?](issues/02-revert-neverscript-fork.md): answered in nsqb's map; unlicensed, THUG2-only
+
 ## Not yet specified
 
 - Where the nailed count (and the stack) sit on the HUD.

@@ -15,8 +15,14 @@ entry:   u32 size, u32 compressed_size (0 = stored), u32 name_len, u32 name_chec
 - Compression is Neversoft LZSS: 4096-byte ring buffer, initial write position
   4078 (N - F), max match 18, threshold 2, flag byte read LSB first, `1` = literal.
   Match = 2 bytes: `pos = b0 | (b1 & 0xF0) << 4`, `len = (b1 & 0x0F) + 3`.
+- The ring starts **filled with spaces (`0x20`)**, as in Okumura's `LZSS.C`.
+  Some entries match into ring cells not yet written, so a zero-filled ring
+  decodes them wrong; `prx.py` zero-fills (not fixed: it's being retired).
+  Okumura's encoder reproduces the original compressed bytes exactly (see
+  prxhawk's `wayfinder/v1/research/reproduce-lzss.md`).
 - Stored (uncompressed) entries are accepted by the game, which is what
-  `prx.replace()` writes. A no-op repack reproduces the original byte-for-byte.
+  `prx.replace()` writes. A no-op repack reproduces the original byte-for-byte
+  (it copies entries without decompressing them).
 
 ## QB key (checksum)
 
